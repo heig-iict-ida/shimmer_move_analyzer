@@ -1,5 +1,6 @@
 package madsdf.shimmer.gui;
 
+import com.google.common.eventbus.EventBus;
 import madsdf.shimmer.glview.ShimmerAngleController;
 import madsdf.shimmer.glview.ShimmerCanvas;
 import java.awt.Cursor;
@@ -18,6 +19,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
+import madsdf.shimmer.event.Globals;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartPanel;
 
@@ -70,7 +72,9 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         restorePreferences();
         chartsDrawer = new ChartsDrawer((ChartPanel) panAccel, (ChartPanel) panGyro);
         
-        angleController = new ShimmerAngleController((ShimmerCanvas)panGL, txtLog);
+        final ShimmerCanvas shimmerCanvas = (ShimmerCanvas)panGL;
+        angleController = new ShimmerAngleController(txtLog);
+        Globals.eventBus.register(shimmerCanvas);
         
         txtLog.setEditable(false);
         

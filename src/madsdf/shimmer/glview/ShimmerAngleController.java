@@ -7,9 +7,11 @@ package madsdf.shimmer.glview;
 import madsdf.shimmer.gui.AccelGyroSample;
 import madsdf.shimmer.filter.ComplementaryFilter;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.JTextArea;
+import madsdf.shimmer.event.Globals;
 
 /**
  * Class that receive Shimmer samples, filter them to extract angle and dispatch
@@ -17,13 +19,21 @@ import javax.swing.JTextArea;
  * @author julien
  */
 public class ShimmerAngleController implements Observer {
+    public static class AngleEvent {
+        // Angles in degrees
+        public final float roll, pitch, yaw;
+        public AngleEvent(float roll, float pitch, float yaw) {
+            this.roll = roll;
+            this.pitch = pitch;
+            this.yaw = yaw;
+        }
+    }
+    
     private ComplementaryFilter cf = new ComplementaryFilter();
-    private ShimmerCanvas canvas;
     private JTextArea logArea;
     private DecimalFormat fmt = new DecimalFormat("#.##");
     
-    public ShimmerAngleController(ShimmerCanvas canvas, JTextArea logArea) {
-        this.canvas = canvas;
+    public ShimmerAngleController(JTextArea logArea) {
         this.logArea = logArea;
     }
 
@@ -32,7 +42,6 @@ public class ShimmerAngleController implements Observer {
       AccelGyroSample sample = (AccelGyroSample) (arg);
       cf.update(sample);
       
-      canvas.updateAngles(cf.angles[0], cf.angles[1], cf.angles[2]);
       
       final float roll = (float) Math.toDegrees(cf.angles[0]);
       final float pitch = (float) Math.toDegrees(cf.angles[1]);
@@ -42,6 +51,8 @@ public class ShimmerAngleController implements Observer {
                  + "pitch :" + fmt.format(pitch) + "\n"
                  + "yaw   :" + fmt.format(yaw) + "\n";
       txt = detectMovements(txt, roll, pitch, yaw);
+      
+      Globals.eventBus.post(new AngleEvent(roll, pitch, yaw));
       logArea.setText(txt);
     }
     

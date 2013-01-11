@@ -4,6 +4,7 @@
  */
 package madsdf.shimmer.glview;
 
+import com.google.common.eventbus.Subscribe;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -31,6 +32,7 @@ import javax.swing.event.MouseInputAdapter;
 import madsdf.shimmer.glutils.ArcBall;
 import madsdf.shimmer.glutils.Matrix4f;
 import madsdf.shimmer.glutils.Quat4f;
+import madsdf.shimmer.glview.ShimmerAngleController.AngleEvent;
 
 /**
  *
@@ -129,11 +131,12 @@ public class ShimmerCanvas extends GLJPanel implements GLEventListener {
     
     private ShimmerCanvas() {}
     
-    public void updateAngles(float roll, float pitch, float yaw) {
+    @Subscribe
+    public void updateAngles(AngleEvent event) {
         synchronized(angleLock) {
-            shimmerAngles[0] = roll;
-            shimmerAngles[1] = pitch;
-            shimmerAngles[2] = yaw;
+            shimmerAngles[0] = event.roll;
+            shimmerAngles[1] = event.pitch;
+            shimmerAngles[2] = event.yaw;
         }
     }
 
@@ -184,9 +187,9 @@ public class ShimmerCanvas extends GLJPanel implements GLEventListener {
         }
         float roll, pitch, yaw;
         synchronized(angleLock) {
-            roll = shimmerAngles[0] * 180.0f / (float)Math.PI;
-            pitch = shimmerAngles[1] * 180.0f / (float)Math.PI;
-            yaw = shimmerAngles[2] * 180.0f / (float)Math.PI;
+            roll = shimmerAngles[0];
+            pitch = shimmerAngles[1];
+            yaw = shimmerAngles[2];
         }
         GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color and depth buffers
