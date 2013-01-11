@@ -1,7 +1,7 @@
 package madsdf.shimmer.gui;
 
 import com.google.common.eventbus.EventBus;
-import madsdf.shimmer.glview.ShimmerAngleController;
+import madsdf.shimmer.glview.ShimmerAngleConverter;
 import madsdf.shimmer.glview.ShimmerCanvas;
 import java.awt.Cursor;
 import java.awt.Toolkit;
@@ -42,7 +42,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     // The class drawing the chart
     private ChartsDrawer chartsDrawer;
     // Controller for OpenGL display
-    private ShimmerAngleController angleController;
+    private ShimmerAngleConverter angleConverter;
     // The write buffer
     private BufferedWriter out;
     // Remember user input
@@ -73,7 +73,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         chartsDrawer = new ChartsDrawer((ChartPanel) panAccel, (ChartPanel) panGyro);
         
         final ShimmerCanvas shimmerCanvas = (ShimmerCanvas)panGL;
-        angleController = new ShimmerAngleController(txtLog);
+        angleConverter = new ShimmerAngleConverter(txtLog);
         Globals.eventBus.register(shimmerCanvas);
         
         txtLog.setEditable(false);
@@ -446,7 +446,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             final String btDeviceID = (String) jcbDevices.getSelectedItem();
             final String btServiceID = "btspp://00066646" + btDeviceID + ":1;authenticate=false;encrypt=false;master=false";
             connectedDevice = new BluetoothDeviceCom(
-                    new Observer[]{chartsDrawer, angleController}, btDeviceID);
+                    new Observer[]{chartsDrawer, angleConverter}, btDeviceID);
             connectedDevice.connect(btServiceID);
             jcbDevices.setEnabled(false);
             btnConnect.setEnabled(false);

@@ -18,7 +18,7 @@ import madsdf.shimmer.event.Globals;
  * angles to various components for display
  * @author julien
  */
-public class ShimmerAngleController implements Observer {
+public class ShimmerAngleConverter implements Observer {
     public static class AngleEvent {
         // Angles in degrees
         public final float roll, pitch, yaw;
@@ -33,7 +33,7 @@ public class ShimmerAngleController implements Observer {
     private JTextArea logArea;
     private DecimalFormat fmt = new DecimalFormat("#.##");
     
-    public ShimmerAngleController(JTextArea logArea) {
+    public ShimmerAngleConverter(JTextArea logArea) {
         this.logArea = logArea;
     }
 

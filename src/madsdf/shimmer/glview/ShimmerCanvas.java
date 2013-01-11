@@ -32,7 +32,7 @@ import javax.swing.event.MouseInputAdapter;
 import madsdf.shimmer.glutils.ArcBall;
 import madsdf.shimmer.glutils.Matrix4f;
 import madsdf.shimmer.glutils.Quat4f;
-import madsdf.shimmer.glview.ShimmerAngleController.AngleEvent;
+import madsdf.shimmer.glview.ShimmerAngleConverter.AngleEvent;
 
 /**
  *
@@ -132,7 +132,7 @@ public class ShimmerCanvas extends GLJPanel implements GLEventListener {
     private ShimmerCanvas() {}
     
     @Subscribe
-    public void updateAngles(AngleEvent event) {
+    public void anglesUpdated(AngleEvent event) {
         synchronized(angleLock) {
             shimmerAngles[0] = event.roll;
             shimmerAngles[1] = event.pitch;
