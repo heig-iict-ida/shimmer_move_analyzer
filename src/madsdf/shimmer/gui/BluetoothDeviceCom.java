@@ -74,15 +74,15 @@ public class BluetoothDeviceCom extends Observable implements Runnable {
         }
         
         // Load calibration
-        final String accelFilename = "shimmer_calib/1_5_" + btDeviceID + ".accel.properties";
-        final String gyroFilename = "shimmer_calib/1_5_" + btDeviceID + ".gyro.properties";
+        final String accelFilename = "/madsdf/shimmer/shimmer_calib/1_5_" + btDeviceID + ".accel.properties";
+        final String gyroFilename = "/madsdf/shimmer/shimmer_calib/1_5_" + btDeviceID + ".gyro.properties";
         loadCalibration(accelFilename, accel_offset, accel_gain);
         loadCalibration(gyroFilename, gyro_offset, gyro_gain);
     }
     
     private void loadCalibration(String filename, float[] outOffset, float[] outGain) throws IOException {
         Properties prop = new Properties();
-        prop.load(new FileInputStream(filename));
+        prop.load(this.getClass().getResourceAsStream(filename));
         outOffset[0] = Float.parseFloat(prop.getProperty("offset_x"));
         outOffset[1] = Float.parseFloat(prop.getProperty("offset_y"));
         outOffset[2] = Float.parseFloat(prop.getProperty("offset_z"));

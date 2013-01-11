@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.DebugGL2;
@@ -153,13 +154,14 @@ public class ShimmerCanvas extends GLJPanel implements GLEventListener {
         // Texture initialization
         final String[] suffixes = {"posx", "negx", "posy", "negy", "posz", "negz"};
         final int[] faces = {POS_X, NEG_X, POS_Y, NEG_Y, POS_Z, NEG_Z};
-        final String basename = "textures/cubemap_";
+        final String basename = "/madsdf/shimmer/textures/cubemap_";
         final String ext = "png";
 
         for (int i = 0; i < suffixes.length; i++) {
             String resourceName = basename + suffixes[i] + "." + ext;
             try {
-                cubeTextures[faces[i]] = TextureIO.newTexture(new File(resourceName), true);
+                InputStream stream = this.getClass().getResourceAsStream(resourceName);
+                cubeTextures[faces[i]] = TextureIO.newTexture(stream, true, TextureIO.PNG);
             } catch (IOException ex) {
                 Logger.getLogger(ShimmerCanvas.class.getName()).log(Level.SEVERE, null, ex);
             }
