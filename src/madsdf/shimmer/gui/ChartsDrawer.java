@@ -34,8 +34,8 @@ public class ChartsDrawer {
    private TimeSeries gyroZ;
    private JFreeChart accelChart;
    private JFreeChart gyroChart;
-   private LinkedList<AccelGyroSample> lastData;
-   private CopyOnWriteArrayList<AccelGyroSample> receivedValues;
+   private LinkedList<AccelGyro.CalibratedSample> lastData;
+   private CopyOnWriteArrayList<AccelGyro.CalibratedSample> receivedValues;
    private boolean drawing = false;
    private Second secondNow = new Second(new Date());
    private int valuePos = Integer.MIN_VALUE;
@@ -49,8 +49,8 @@ public class ChartsDrawer {
     */
    public ChartsDrawer(ChartPanel panAccel, ChartPanel panGyro) {
 
-      lastData = new LinkedList<AccelGyroSample>();
-      receivedValues = new CopyOnWriteArrayList<AccelGyroSample>();
+      lastData = new LinkedList<AccelGyro.CalibratedSample>();
+      receivedValues = new CopyOnWriteArrayList<AccelGyro.CalibratedSample>();
 
       createChart();
       chartColor = panAccel.getBackground();
@@ -126,7 +126,7 @@ public class ChartsDrawer {
    }
    
    @Subscribe
-   public void onSample(AccelGyroSample sample) {
+   public void onSample(AccelGyro.CalibratedSample sample) {
       // Add the sample in the complete list
       receivedValues.add(sample);
       
@@ -148,7 +148,7 @@ public class ChartsDrawer {
       synchronized (lastData) {
          // Iterate from the last SAMPLE_SIZE sample received
          int start = Math.max(getReceivedValues().size() - SAMPLE_SIZE, 0);
-         ListIterator<AccelGyroSample> iterator = getReceivedValues().listIterator(start);
+         ListIterator<AccelGyro.CalibratedSample> iterator = getReceivedValues().listIterator(start);
          
          // Add each sample in order to the chart
          while (iterator.hasNext()) {
@@ -161,7 +161,7 @@ public class ChartsDrawer {
     * Add a single sample of values to the charts
     * @param sample to be added
     */
-   private void addSampleToChart(AccelGyroSample sample) {
+   private void addSampleToChart(AccelGyro.CalibratedSample sample) {
       
       // Add the sample in the list, maintening SAMPLE_SIZE sample
       if (getLastHundred().size() == SAMPLE_SIZE) {
@@ -182,14 +182,14 @@ public class ChartsDrawer {
    /**
     * @return the last SAMPLE_SIZE values displayed on the charts
     */
-   public LinkedList<AccelGyroSample> getLastHundred() {
+   public LinkedList<AccelGyro.CalibratedSample> getLastHundred() {
       return lastData;
    }
 
    /**
     * @return all the received values
     */
-   public CopyOnWriteArrayList<AccelGyroSample> getReceivedValues() {
+   public CopyOnWriteArrayList<AccelGyro.CalibratedSample> getReceivedValues() {
       return receivedValues;
    }
 

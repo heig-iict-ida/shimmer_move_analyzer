@@ -4,7 +4,7 @@
  */
 package madsdf.shimmer.filter;
 
-import madsdf.shimmer.gui.AccelGyroSample;
+import madsdf.shimmer.gui.AccelGyro;
 
 /**
  *
@@ -24,7 +24,7 @@ public class ComplementaryFilter {
     
     private long prevUpdateMillis = 0;
     
-    public void update(AccelGyroSample sample) {
+    public void update(AccelGyro.CalibratedSample sample) {
         // Compute dt
         if (prevUpdateMillis == 0) {
             prevUpdateMillis = sample.receivedTimestampMillis;

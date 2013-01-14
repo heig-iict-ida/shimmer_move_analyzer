@@ -6,7 +6,7 @@ package madsdf.shimmer.glview;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import madsdf.shimmer.gui.AccelGyroSample;
+import madsdf.shimmer.gui.AccelGyro;
 import madsdf.shimmer.filter.ComplementaryFilter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class ShimmerAngleConverter {
     }
     
     @Subscribe
-    public void onSample(AccelGyroSample sample) {
+    public void onSample(AccelGyro.CalibratedSample sample) {
       cf.update(sample);
       
       final float roll = (float) Math.toDegrees(cf.angles[0]);

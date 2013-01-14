@@ -102,7 +102,22 @@ public class BluetoothDeviceCom implements Runnable {
         Log.info("Connected to " + connectionURL);
     }
     
-    private AccelGyroSample parseSample(long time, byte[] sample) throws IllegalArgumentException {
+    private AccelGyro.CalibratedSample
+            calibrateSample(AccelGyro.UncalibratedSample s) {
+        // Calibrate
+        float[] accel = new float[3];
+        float[] gyro = new float[3];
+        for (int i = 0; i < 3; ++i) {
+            accel[i] = ((s.accel[i] - accel_offset[i]) / accel_gain[i]) * 9.81f;
+        }
+        for (int i = 0; i < 3; ++i) {
+            gyro[i] = (s.gyro[i] - gyro_offset[i]) / gyro_gain[i];
+        }
+        return new AccelGyro.CalibratedSample(s.receivedTimestampMillis, accel, gyro);
+    }
+    
+    private AccelGyro.UncalibratedSample
+                        parseSample(long time, byte[] sample) throws IllegalArgumentException {
         float[] accel = new float[3];
         float[] gyro = new float[3];
         if (sample[0] == DATA_TYPE) {
@@ -123,15 +138,7 @@ public class BluetoothDeviceCom implements Runnable {
             throw new IllegalArgumentException("AccelGyroSample, bad data : "
                     + ByteUtils.getHexString(sample, sample.length));
         }
-        
-        // Calibrate
-        for (int i = 0; i < 3; ++i) {
-            accel[i] = ((accel[i] - accel_offset[i]) / accel_gain[i]) * 9.81f;
-        }
-        for (int i = 0; i < 3; ++i) {
-            gyro[i] = (gyro[i] - gyro_offset[i]) / gyro_gain[i];
-        }
-        return new AccelGyroSample(time, accel, gyro);
+        return new AccelGyro.UncalibratedSample(time, accel, gyro);
     }
     
     private void sendCommand(byte... commands) throws IOException {
@@ -174,9 +181,12 @@ public class BluetoothDeviceCom implements Runnable {
                     // If the sample is complete it is passed to the display
                     if (current == SAMPLE_SIZE) {
                         try {
-                            AccelGyroSample s = parseSample(
+                            // Broadcast both calibrated and uncalibrated samples
+                            AccelGyro.UncalibratedSample us = parseSample(
                                     System.currentTimeMillis(), sample);
-                            ebus.post(s);
+                            AccelGyro.CalibratedSample cs = calibrateSample(us);
+                            ebus.post(us);
+                            ebus.post(cs);
                         } catch (IllegalArgumentException e) {
                             System.err.println("Packet error : " + e);
                         }
