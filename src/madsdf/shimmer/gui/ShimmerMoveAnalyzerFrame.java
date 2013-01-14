@@ -53,6 +53,12 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     private int maxSample = 10;
     private int currentCommand = 1;
     private int currentSample = 1;
+    
+    private final String btid;
+    
+    private final Logger log = Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName());
+    
+    private final EventBus eventBus;
 
     /**
      * Creates new form ShimmerMoveAnalyzerFrame
@@ -60,31 +66,34 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
      * @param args The numbers of commands and samples can be passed via the
      * console parameters.
      */
-    public ShimmerMoveAnalyzerFrame(String[] args) {
-        // Check the parameters
-        if (args.length == 2) {
-            maxCommand = Integer.parseInt(args[0]);
-            maxSample = Integer.parseInt(args[1]);
-        }
-
+    public ShimmerMoveAnalyzerFrame(String title, String btid) {
+        this.btid = btid;
         initComponents();
-        prefs = Preferences.userRoot().node(this.getClass().getName());
-        restorePreferences();
+        setTitle(title);
+        /*prefs = Preferences.userRoot().node(this.getClass().getName());
+        restorePreferences();*/
         chartsDrawer = new ChartsDrawer((ChartPanel) panAccel, (ChartPanel) panGyro);
         
         final ShimmerCanvas shimmerCanvas = (ShimmerCanvas)panGL;
-        angleConverter = new ShimmerAngleConverter(txtLog);
-        Globals.eventBus.register(shimmerCanvas);
+        eventBus = Globals.getBusForShimmer(btid);
+        angleConverter = new ShimmerAngleConverter(eventBus, txtLog);
+        
+        // Eventbus registration
+        eventBus.register(shimmerCanvas);
+        eventBus.register(chartsDrawer);
+        eventBus.register(angleConverter);
         
         txtLog.setEditable(false);
         
+        labBtId.setText(btid);
+        
         // Automatically start streaming
         // TODO: This is DEBUG only
-        btnConnect.doClick();
+        connect();
         btnRun.doClick();
     }
     
-    private void restorePreferences() {
+    /*private void restorePreferences() {
         Log.info(prefs.get(PREFS_DEVICES, ""));
         String[] devices = StringUtils.split(prefs.get(PREFS_DEVICES, ""), ";");
         jcbDevices.setModel(new DefaultComboBoxModel(devices));
@@ -101,6 +110,21 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         Log.info("Preferences saved");
+    }*/
+    
+    private void connect() {
+        try {
+            log.info("Connecting to shimmer...");
+            final String btServiceID = "btspp://00066646" + btid + ":1;authenticate=false;encrypt=false;master=false";
+            connectedDevice = new BluetoothDeviceCom(eventBus, btid);
+            connectedDevice.connect(btServiceID);
+            btnLatest.setEnabled(true);
+            btnRun.setEnabled(true);
+            btnSave.setEnabled(true);
+            log.info("Connected to shimmer");
+        } catch (IOException ex) {
+            Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -123,8 +147,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         btnStop = new javax.swing.JButton();
         jPanelConnect = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
-        jcbDevices = new javax.swing.JComboBox();
-        btnConnect = new javax.swing.JButton();
+        labBtId = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         panAccel = new ChartPanel(null);
         panGyro = new ChartPanel(null);
@@ -136,8 +159,9 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         setTitle("Graph accelerometer / gyro");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("shimmer_icon.png")));
-        setMinimumSize(new java.awt.Dimension(800, 600));
+        setMinimumSize(new java.awt.Dimension(500, 400));
         setName("frmShimmerMoveAnalyzer"); // NOI18N
+        setPreferredSize(new java.awt.Dimension(400, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -246,14 +270,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
 
         jLabel9.setText("BT ID :");
 
-        jcbDevices.setEditable(true);
-
-        btnConnect.setText("Connect");
-        btnConnect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConnectActionPerformed(evt);
-            }
-        });
+        labBtId.setText("jLabel1");
 
         javax.swing.GroupLayout jPanelConnectLayout = new javax.swing.GroupLayout(jPanelConnect);
         jPanelConnect.setLayout(jPanelConnectLayout);
@@ -262,10 +279,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             .addGroup(jPanelConnectLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jcbDevices, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnConnect)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labBtId)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelConnectLayout.setVerticalGroup(
@@ -274,9 +289,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
                 .addContainerGap()
                 .addGroup(jPanelConnectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(jcbDevices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConnect))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(labBtId))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 2, 5, 5));
@@ -291,7 +305,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         );
         panAccelLayout.setVerticalGroup(
             panAccelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 191, Short.MAX_VALUE)
+            .addGap(0, 193, Short.MAX_VALUE)
         );
 
         jPanel2.add(panAccel);
@@ -306,7 +320,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         );
         panGyroLayout.setVerticalGroup(
             panGyroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 191, Short.MAX_VALUE)
+            .addGap(0, 193, Short.MAX_VALUE)
         );
 
         jPanel2.add(panGyro);
@@ -319,7 +333,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         );
         panGLLayout.setVerticalGroup(
             panGLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 191, Short.MAX_VALUE)
+            .addGap(0, 193, Short.MAX_VALUE)
         );
 
         jPanel2.add(panGL);
@@ -353,7 +367,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
                 .addContainerGap()
                 .addComponent(jPanelConnect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -440,26 +454,6 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
        btnStop.setEnabled(true);
    }//GEN-LAST:event_btnRunActionPerformed
 
-    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
-        try {
-            // Log.info("Service : " + StringUtils.join(servicesList, ", "));
-            final String btDeviceID = (String) jcbDevices.getSelectedItem();
-            final String btServiceID = "btspp://00066646" + btDeviceID + ":1;authenticate=false;encrypt=false;master=false";
-            connectedDevice = new BluetoothDeviceCom(
-                    new Observer[]{chartsDrawer, angleConverter}, btDeviceID);
-            connectedDevice.connect(btServiceID);
-            jcbDevices.setEnabled(false);
-            btnConnect.setEnabled(false);
-            btnLatest.setEnabled(true);
-            btnRun.setEnabled(true);
-            btnSave.setEnabled(true);
-
-            appendToPreferences(PREFS_DEVICES, btDeviceID);
-        } catch (IOException ex) {
-            Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_btnConnectActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -499,14 +493,15 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         /*
          * Create and display the form
          */
+        // TODO: Get that from properties file
+        final String btid = "BDCD";
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ShimmerMoveAnalyzerFrame(args).setVisible(true);
+                new ShimmerMoveAnalyzerFrame("Shimmer", btid).setVisible(true);
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnConnect;
     private java.awt.Button btnLatest;
     private javax.swing.JButton btnRun;
     private java.awt.Button btnSave;
@@ -517,7 +512,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanelConnect;
-    private javax.swing.JComboBox jcbDevices;
+    private javax.swing.JLabel labBtId;
     private javax.swing.JLabel lblCmd;
     private javax.swing.JLabel lblSample;
     private javax.swing.JPanel panAccel;

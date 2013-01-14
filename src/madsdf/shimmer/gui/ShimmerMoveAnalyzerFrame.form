@@ -11,9 +11,12 @@
       <Connection code="Toolkit.getDefaultToolkit().getImage(getClass().getResource(&quot;shimmer_icon.png&quot;))" type="code"/>
     </Property>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[800, 600]"/>
+      <Dimension value="[500, 400]"/>
     </Property>
     <Property name="name" type="java.lang.String" value="frmShimmerMoveAnalyzer" noResource="true"/>
+    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[400, 400]"/>
+    </Property>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -60,7 +63,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanelConnect" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jPanel2" max="32767" attributes="0"/>
+              <Component id="jPanel2" pref="392" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPanel5" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -222,10 +225,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="jcbDevices" min="-2" pref="147" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="btnConnect" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="labBtId" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -236,10 +237,9 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jcbDevices" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnConnect" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="labBtId" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="17" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -250,18 +250,10 @@
             <Property name="text" type="java.lang.String" value="BT ID :"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="jcbDevices">
+        <Component class="javax.swing.JLabel" name="labBtId">
           <Properties>
-            <Property name="editable" type="boolean" value="true"/>
+            <Property name="text" type="java.lang.String" value="jLabel1"/>
           </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="btnConnect">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Connect"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConnectActionPerformed"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -290,7 +282,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="191" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="193" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -311,7 +303,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="191" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="193" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -329,7 +321,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="191" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="193" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>

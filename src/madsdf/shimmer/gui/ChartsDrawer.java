@@ -1,5 +1,6 @@
 package madsdf.shimmer.gui;
 
+import com.google.common.eventbus.Subscribe;
 import java.awt.Color;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,7 +24,7 @@ import org.jfree.data.time.TimeSeriesCollection;
  * @author Gregoire Aubert
  * @version 1.0
  */
-public class ChartsDrawer implements Observer {
+public class ChartsDrawer {
 
    private TimeSeries accelX;
    private TimeSeries accelY;
@@ -123,12 +124,10 @@ public class ChartsDrawer implements Observer {
       axisGyro.setMinorTickCount(10);
       axisGyro.setTickLabelsVisible(false);
    }
-
-   @Override
-   public void update(Observable o, Object arg) {
-
+   
+   @Subscribe
+   public void onSample(AccelGyroSample sample) {
       // Add the sample in the complete list
-      AccelGyroSample sample = (AccelGyroSample) (arg);
       receivedValues.add(sample);
       
       if(receivedValues.size() > 20 * SAMPLE_SIZE)
@@ -141,7 +140,7 @@ public class ChartsDrawer implements Observer {
          }
       }
    }
-
+   
    /**
     * Draw the last SAMPLE_SIZE values on the charts
     */

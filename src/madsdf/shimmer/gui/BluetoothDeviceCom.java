@@ -1,5 +1,6 @@
 package madsdf.shimmer.gui;
 
+import com.google.common.eventbus.EventBus;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +21,7 @@ import javax.microedition.io.StreamConnection;
  * @author Gregoire Aubert
  * @version 1.0
  */
-public class BluetoothDeviceCom extends Observable implements Runnable {
+public class BluetoothDeviceCom implements Runnable {
     // See /home/julien/work/shimmer/tinyos-2.x-contrib/shimmer/apps/BoilerPlate/README.txt
     public final byte START_STREAMING_COMMAND = 0x07;
     public final byte STOP_STREAMING_COMMAND = 0x20;
@@ -61,6 +62,8 @@ public class BluetoothDeviceCom extends Observable implements Runnable {
     private float[] accel_gain = new float[3];
     private float[] gyro_offset = new float[3];
     private float[] gyro_gain = new float[3];
+    
+    private final EventBus ebus;
 
     /**
      * Constructor
@@ -68,11 +71,8 @@ public class BluetoothDeviceCom extends Observable implements Runnable {
      * @param connectionURL is the service on the device
      * @param observers a list of observers to be notified when new data is available
      */
-    public BluetoothDeviceCom(Observer[] observers, String btDeviceID) throws IOException {
-        for (Observer o: observers) {
-            this.addObserver(o);
-        }
-        
+    public BluetoothDeviceCom(EventBus ebus, String btDeviceID) throws IOException {
+        this.ebus = ebus;
         // Load calibration
         final String accelFilename = "/madsdf/shimmer/shimmer_calib/1_5_" + btDeviceID + ".accel.properties";
         final String gyroFilename = "/madsdf/shimmer/shimmer_calib/1_5_" + btDeviceID + ".gyro.properties";
@@ -176,8 +176,7 @@ public class BluetoothDeviceCom extends Observable implements Runnable {
                         try {
                             AccelGyroSample s = parseSample(
                                     System.currentTimeMillis(), sample);
-                            this.notifyObservers(s);
-                            this.setChanged();
+                            ebus.post(s);
                         } catch (IllegalArgumentException e) {
                             System.err.println("Packet error : " + e);
                         }
