@@ -408,7 +408,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
 
            // Save the last 100 values in the right string
            synchronized (chartsDrawer.getLastHundred()) {
-               for (AccelGyro.CalibratedSample sample : chartsDrawer.getLastHundred()) {
+               for (AccelGyro.Sample sample : chartsDrawer.getLastHundred()) {
                    for (int i = 0; i < 3; ++i) {
                        lignes[i] += sample.accel[i] + ";";
                    }

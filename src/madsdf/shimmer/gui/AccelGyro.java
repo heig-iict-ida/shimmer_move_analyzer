@@ -5,42 +5,32 @@ import java.util.LinkedList;
 /**
  * A sample received from the shimmer containing accel / gyro measurements
  * You can choose if you want calibrated or uncalibrated data by listening
- * for the correct class on the eventbus
+ * for the correct class on the eventbus (that's why we use two different
+ * classes for calibrated/uncalibrated).
  */
 public class AccelGyro {
-    public static class CalibratedSample {
+    // Base class for samples
+    public static abstract class Sample {
         public final long receivedTimestampMillis;
         public final float accel[] = new float[3];
         public final float gyro[] = new float[3];
 
-        /**
-         * Constructor
-         *
-         * @param buffer is the data to convert
-         * @throws Exception if the buffer is malformed
-         */
-        public CalibratedSample(long time, float[] accel, float[] gyro) {
+        public Sample(long time, float[] accel, float[] gyro) {
             this.receivedTimestampMillis = time;
             System.arraycopy(accel, 0, this.accel, 0, 3);
             System.arraycopy(gyro, 0, this.gyro, 0, 3);
         }
+        
+    }
+    public static class CalibratedSample extends Sample {
+        public CalibratedSample(long time, float[] accel, float[] gyro) {
+            super(time, accel, gyro);
+        }
     }
     
-    public static class UncalibratedSample {
-        public final long receivedTimestampMillis;
-        public final float accel[] = new float[3];
-        public final float gyro[] = new float[3];
-
-        /**
-         * Constructor
-         *
-         * @param buffer is the data to convert
-         * @throws Exception if the buffer is malformed
-         */
+    public static class UncalibratedSample extends Sample {
         public UncalibratedSample(long time, float[] accel, float[] gyro) {
-            this.receivedTimestampMillis = time;
-            System.arraycopy(accel, 0, this.accel, 0, 3);
-            System.arraycopy(gyro, 0, this.gyro, 0, 3);
+            super(time, accel, gyro);
         }
         
         // TODO: Remove : this is only for backward-compatibility

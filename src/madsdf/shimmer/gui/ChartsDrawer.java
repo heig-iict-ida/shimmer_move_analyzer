@@ -1,7 +1,9 @@
 package madsdf.shimmer.gui;
 
+import static com.google.common.base.Preconditions.*;
 import com.google.common.eventbus.Subscribe;
 import java.awt.Color;
+import java.awt.Paint;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.jfree.chart.ChartFactory;
@@ -9,6 +11,8 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
@@ -34,8 +38,8 @@ public class ChartsDrawer {
    private TimeSeries gyroZ;
    private JFreeChart accelChart;
    private JFreeChart gyroChart;
-   private LinkedList<AccelGyro.CalibratedSample> lastData;
-   private CopyOnWriteArrayList<AccelGyro.CalibratedSample> receivedValues;
+   private LinkedList<AccelGyro.Sample> lastData;
+   private CopyOnWriteArrayList<AccelGyro.Sample> receivedValues;
    private boolean drawing = false;
    private Second secondNow = new Second(new Date());
    private int valuePos = Integer.MIN_VALUE;
@@ -49,8 +53,8 @@ public class ChartsDrawer {
     */
    public ChartsDrawer(ChartPanel panAccel, ChartPanel panGyro) {
 
-      lastData = new LinkedList<AccelGyro.CalibratedSample>();
-      receivedValues = new CopyOnWriteArrayList<AccelGyro.CalibratedSample>();
+      lastData = new LinkedList<AccelGyro.Sample>();
+      receivedValues = new CopyOnWriteArrayList<AccelGyro.Sample>();
 
       createChart();
       chartColor = panAccel.getBackground();
@@ -103,6 +107,19 @@ public class ChartsDrawer {
       axisAcc.setAutoRange(true);
       axisAcc.setFixedAutoRange(SAMPLE_SIZE);     // Define the number of visible value
       axisAcc.setTickLabelsVisible(false);  // Hide the axis labels
+      
+      plotAcc.setRenderer(new XYLineAndShapeRenderer(true, false) {
+          @Override
+          public Paint lookupSeriesPaint(int series) {
+              checkState(series >= 0 && series < 3);
+              switch(series) {
+                      case 0: return Color.RED;
+                      case 1: return Color.GREEN;
+                      case 2: return Color.BLUE;
+                      default: return Color.BLACK;
+              }
+          }
+      });
 
       gyroChart = ChartFactory.createTimeSeriesChart(
               "Gyroscope",
@@ -148,7 +165,7 @@ public class ChartsDrawer {
       synchronized (lastData) {
          // Iterate from the last SAMPLE_SIZE sample received
          int start = Math.max(getReceivedValues().size() - SAMPLE_SIZE, 0);
-         ListIterator<AccelGyro.CalibratedSample> iterator = getReceivedValues().listIterator(start);
+         ListIterator<AccelGyro.Sample> iterator = getReceivedValues().listIterator(start);
          
          // Add each sample in order to the chart
          while (iterator.hasNext()) {
@@ -161,7 +178,7 @@ public class ChartsDrawer {
     * Add a single sample of values to the charts
     * @param sample to be added
     */
-   private void addSampleToChart(AccelGyro.CalibratedSample sample) {
+   private void addSampleToChart(AccelGyro.Sample sample) {
       
       // Add the sample in the list, maintening SAMPLE_SIZE sample
       if (getLastHundred().size() == SAMPLE_SIZE) {
@@ -182,14 +199,14 @@ public class ChartsDrawer {
    /**
     * @return the last SAMPLE_SIZE values displayed on the charts
     */
-   public LinkedList<AccelGyro.CalibratedSample> getLastHundred() {
+   public LinkedList<AccelGyro.Sample> getLastHundred() {
       return lastData;
    }
 
    /**
     * @return all the received values
     */
-   public CopyOnWriteArrayList<AccelGyro.CalibratedSample> getReceivedValues() {
+   public CopyOnWriteArrayList<AccelGyro.Sample> getReceivedValues() {
       return receivedValues;
    }
 
