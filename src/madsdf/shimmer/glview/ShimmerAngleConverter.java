@@ -45,14 +45,23 @@ public class ShimmerAngleConverter {
     public void onSample(AccelGyro.CalibratedSample sample) {
       cf.update(sample);
       
-      final float roll = (float) Math.toDegrees(cf.angles[0]);
-      final float pitch = (float) Math.toDegrees(cf.angles[1]);
-      final float yaw = (float) Math.toDegrees(cf.angles[2]);
+      float roll = (float) Math.toDegrees(cf.angles[0]);
+      float pitch = (float) Math.toDegrees(cf.angles[1]);
+      float yaw = (float) Math.toDegrees(cf.angles[2]);
+      
+      // When pitch becomes too big, roll estimation becomes wrong. So
+      // simply force the angles
+      // TODO: Not sure this is the best way to do it... the filter might
+      // be a bit too steep 
+      if (pitch < -70 || pitch > 70) {
+          roll = 0;
+          pitch = pitch < -70 ? -70 : 70;
+      }
       
       String txt = "roll  :" + fmt.format(roll) + "\n"
                  + "pitch :" + fmt.format(pitch) + "\n"
                  + "yaw   :" + fmt.format(yaw) + "\n";
-      txt = detectMovements(txt, roll, pitch, yaw);
+      //txt = detectMovements(txt, roll, pitch, yaw);
       
       ebus.post(new AngleEvent(roll, pitch, yaw));
       logArea.setText(txt);

@@ -143,7 +143,7 @@ public class ChartsDrawer {
    }
    
    @Subscribe
-   public void onSample(AccelGyro.CalibratedSample sample) {
+   public void onSample(AccelGyro.UncalibratedSample sample) {
       // Add the sample in the complete list
       receivedValues.add(sample);
       

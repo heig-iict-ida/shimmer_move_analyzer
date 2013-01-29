@@ -21,6 +21,13 @@ public class AccelGyro {
             System.arraycopy(gyro, 0, this.gyro, 0, 3);
         }
         
+        @Override
+        public String toString() {
+            return "sample @ " + receivedTimestampMillis + ", accel = ("
+                    + accel[0] + ", " + accel[1] + ", " + accel[2] + "), " +
+                    "gyro = (" + gyro[0] + ", " + gyro[1] + ", " + gyro[2] + ")";
+        }
+        
     }
     public static class CalibratedSample extends Sample {
         public CalibratedSample(long time, float[] accel, float[] gyro) {
