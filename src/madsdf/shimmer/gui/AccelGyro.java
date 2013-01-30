@@ -48,7 +48,7 @@ public class AccelGyro {
             if (i <= 3) {
                 return accel[i - 1];
             } else {
-                return accel[i - 4];
+                return gyro[i - 4];
             }
             
         }
