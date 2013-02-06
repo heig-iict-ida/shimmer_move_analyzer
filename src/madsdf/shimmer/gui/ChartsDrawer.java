@@ -1,6 +1,7 @@
 package madsdf.shimmer.gui;
 
 import static com.google.common.base.Preconditions.*;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import java.awt.Color;
 import java.awt.Paint;
@@ -52,7 +53,6 @@ public class ChartsDrawer {
     * @param panGyro will contain the gyroscope chart
     */
    public ChartsDrawer(ChartPanel panAccel, ChartPanel panGyro) {
-
       lastData = new LinkedList<AccelGyro.Sample>();
       receivedValues = new CopyOnWriteArrayList<AccelGyro.Sample>();
 
@@ -201,6 +201,26 @@ public class ChartsDrawer {
     */
    public LinkedList<AccelGyro.Sample> getLastHundred() {
       return lastData;
+   }
+   
+   public float[][] getRecentAccelData() {
+       final int N_KEPT = 200;
+       float[][] data = new float[3][];
+       data[0] = new float[N_KEPT];
+       data[1] = new float[N_KEPT];
+       data[2] = new float[N_KEPT];
+       
+       ArrayList<AccelGyro.Sample> allSamples = Lists.newArrayList(receivedValues);
+
+       int start = Math.max(0,allSamples.size() - N_KEPT);
+       int datai = 0;
+       for (int i = start; i < allSamples.size(); ++i) {
+           for (int j = 0; j < 3; ++j) {
+               data[j][datai] = allSamples.get(i).accel[j];
+           }
+           ++datai;
+       }
+       return data;
    }
 
    /**

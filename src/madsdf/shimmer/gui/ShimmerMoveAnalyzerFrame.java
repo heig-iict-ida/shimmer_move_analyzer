@@ -90,7 +90,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         // Automatically start streaming
         // TODO: This is DEBUG only
         connect();
-        btnRun.doClick();
+        chartsDrawer.setDrawing(true);
     }
     
     /*private void restorePreferences() {
@@ -118,9 +118,6 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             final String btServiceID = "btspp://00066646" + btid + ":1;authenticate=false;encrypt=false;master=false";
             connectedDevice = new BluetoothDeviceCom(eventBus, btid);
             connectedDevice.connect(btServiceID);
-            btnLatest.setEnabled(true);
-            btnRun.setEnabled(true);
-            btnSave.setEnabled(true);
             log.info("Connected to shimmer");
         } catch (IOException ex) {
             Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -137,14 +134,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     private void initComponents() {
 
         jPanel5 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        lblCmd = new javax.swing.JLabel();
-        lblSample = new javax.swing.JLabel();
-        btnSave = new java.awt.Button();
-        btnLatest = new java.awt.Button();
-        btnRun = new javax.swing.JButton();
         btnStop = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
         jPanelConnect = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         labBtId = new javax.swing.JLabel();
@@ -168,47 +159,17 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             }
         });
 
-        jLabel7.setText("Current command :");
-
-        jLabel8.setText("Current sample :");
-
-        lblCmd.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lblCmd.setText("1");
-
-        lblSample.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lblSample.setText("1");
-
-        btnSave.setEnabled(false);
-        btnSave.setLabel("Save sample");
-        btnSave.setName(""); // NOI18N
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
-            }
-        });
-
-        btnLatest.setEnabled(false);
-        btnLatest.setLabel("Lastest 100");
-        btnLatest.setName(""); // NOI18N
-        btnLatest.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLatestActionPerformed(evt);
-            }
-        });
-
-        btnRun.setText("Run");
-        btnRun.setEnabled(false);
-        btnRun.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRunActionPerformed(evt);
-            }
-        });
-
         btnStop.setText("Stop");
-        btnStop.setEnabled(false);
         btnStop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnStopActionPerformed(evt);
+            }
+        });
+
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
             }
         });
 
@@ -216,57 +177,22 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblSample))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(59, 59, 59)
-                        .addComponent(lblCmd)))
-                .addGap(31, 31, 31)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnLatest, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGap(0, 3, Short.MAX_VALUE)
-                        .addComponent(btnRun)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnStop)
-                        .addGap(1, 1, 1)))
-                .addContainerGap())
+                .addComponent(btnSave)
+                .addGap(18, 18, 18)
+                .addComponent(btnStop)
+                .addContainerGap(351, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(lblCmd))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8)
-                            .addComponent(lblSample)))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnRun)
-                            .addComponent(btnStop))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnLatest, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnStop)
+                    .addComponent(btnSave))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
-
-        lblCmd.getAccessibleContext().setAccessibleName("lblCmd");
-        lblSample.getAccessibleContext().setAccessibleName("lblSample");
-        btnLatest.getAccessibleContext().setAccessibleName("btnStop");
 
         jLabel9.setText("BT ID :");
 
@@ -357,7 +283,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
                             .addComponent(jPanelConnect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
@@ -376,70 +302,10 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-   private void btnLatestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLatestActionPerformed
-       chartsDrawer.drawLatestHundred();
-   }//GEN-LAST:event_btnLatestActionPerformed
-
    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
        btnStop.setEnabled(false);
        chartsDrawer.setDrawing(false);
-       btnRun.setEnabled(true);
-       btnLatest.setEnabled(true);
    }//GEN-LAST:event_btnStopActionPerformed
-
-   private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-       try {
-
-           // Check if the file is already open
-           if (out == null) {
-               out = new BufferedWriter(new FileWriter("RawData.txt"));
-           }
-
-           out.write("COMMAND " + currentCommand + " SAMPLE " + currentSample + "\n");
-
-           // Initialise the string tab
-           String[] lignes = new String[6];
-           lignes[0] = "Accel X : ";
-           lignes[1] = "Accel Y : ";
-           lignes[2] = "Accel Z : ";
-           lignes[3] = "Gyro X : ";
-           lignes[4] = "Gyro Y : ";
-           lignes[5] = "Gyro Z : ";
-
-           // Save the last 100 values in the right string
-           synchronized (chartsDrawer.getLastHundred()) {
-               for (AccelGyro.Sample sample : chartsDrawer.getLastHundred()) {
-                   for (int i = 0; i < 3; ++i) {
-                       lignes[i] += sample.accel[i] + ";";
-                   }
-                   for (int i = 0; i < 3; ++i) {
-                       lignes[i] += sample.gyro[i] + ";";
-                   }
-               }
-           }
-
-           // Write the file
-           for (String ligne : lignes) {
-               out.write(ligne.replaceFirst(";$", "\n"));
-           }
-
-           // Change the sample or the command
-           if (++currentSample > maxSample) {
-               currentSample = 1;
-               if (++currentCommand > maxCommand) {
-                   btnSave.setEnabled(false);
-                   out.close();
-                   lblCmd.setText("#");
-               } else {
-                   lblCmd.setText(currentCommand + "");
-               }
-           }
-
-           lblSample.setText(currentSample + "");
-       } catch (IOException ex) {
-           System.err.println("ShimmerMoveAnalyserFrame.btnSaveActionPerformed: " + ex);
-       }
-   }//GEN-LAST:event_btnSaveActionPerformed
 
    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
        if (connectedDevice != null) {
@@ -447,12 +313,26 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
        }
    }//GEN-LAST:event_formWindowClosing
 
-   private void btnRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRunActionPerformed
-       btnRun.setEnabled(false);
-       btnLatest.setEnabled(false);
-       chartsDrawer.setDrawing(true);
-       btnStop.setEnabled(true);
-   }//GEN-LAST:event_btnRunActionPerformed
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                FileWriter output = null;
+                try {
+                    float[][] accelData = chartsDrawer.getRecentAccelData();
+                    output = new FileWriter("/home/julien/tmp/movement.txt");
+                    new CaptureEditFrame(output, accelData).setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        output.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_btnSaveActionPerformed
 
     /**
      * @param args the command line arguments
@@ -502,19 +382,13 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private java.awt.Button btnLatest;
-    private javax.swing.JButton btnRun;
-    private java.awt.Button btnSave;
+    private javax.swing.JButton btnSave;
     private javax.swing.JButton btnStop;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanelConnect;
     private javax.swing.JLabel labBtId;
-    private javax.swing.JLabel lblCmd;
-    private javax.swing.JLabel lblSample;
     private javax.swing.JPanel panAccel;
     private javax.swing.JPanel panGL;
     private javax.swing.JPanel panGyro;
