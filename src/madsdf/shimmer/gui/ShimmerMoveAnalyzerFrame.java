@@ -318,7 +318,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             public void run() {
                 FileWriter output = null;
                 float[][] accelData = chartsDrawer.getRecentAccelData();
-                new CaptureEditFrame("movements", accelData).setVisible(true);
+                new CaptureEditFrame("movements", btid, accelData).setVisible(true);
             }
         });
     }//GEN-LAST:event_btnSaveActionPerformed

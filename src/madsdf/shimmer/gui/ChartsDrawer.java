@@ -204,7 +204,7 @@ public class ChartsDrawer {
    }
    
    public float[][] getRecentAccelData() {
-       final int N_KEPT = 200;
+       final int N_KEPT = 400;
        float[][] data = new float[3][];
        data[0] = new float[N_KEPT];
        data[1] = new float[N_KEPT];

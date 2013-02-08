@@ -50,12 +50,15 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private XYSeries[] accelSeries = new XYSeries[3];
     private JFreeChart chart;
     
+    private final int MOVEMENT_LENGTH = 150;
+    
     private SpinnerNumberModel startSpinnerModel;
     private SpinnerNumberModel endSpinnerModel;
     private ValueMarker startMarker;
     private ValueMarker endMarker;
     
     private File saveFolder;
+    private final String namePrefix;
     
     private float[][] accelData;
     
@@ -73,10 +76,11 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     /**
      * Creates new form CaptureEditFrame
      */
-    public CaptureEditFrame(String saveDir, float[][] accel) {
+    public CaptureEditFrame(String saveDir, String namePrefix, float[][] accel) {
         checkState(accel.length == 3);
         initComponents();
         
+        this.namePrefix = namePrefix;
         this.saveFolder = new File(saveDir);
         this.accelData = arrCopy(accel);
         
@@ -102,12 +106,12 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         endMarker.setPaint(Color.BLUE);
         
         startSpinnerModel = (SpinnerNumberModel) startSpinner.getModel();
+        endSpinnerModel = (SpinnerNumberModel) endSpinner.getModel();
         startSpinnerModel.setMinimum(0);
         startSpinnerModel.setMaximum(accel[0].length - 1);
-        endSpinnerModel = (SpinnerNumberModel) endSpinner.getModel();
         endSpinnerModel.setMinimum(0);
         endSpinnerModel.setMaximum(accel[0].length - 1);
-        endSpinnerModel.setValue(accel[0].length - 1);
+        endSpinnerModel.setValue(Math.max(MOVEMENT_LENGTH, accel[0].length - 1));
         spinnerSetCommitOnEdit(startSpinner);
         spinnerSetCommitOnEdit(endSpinner);
         
@@ -202,6 +206,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         jLabel2.setText("End");
 
         endSpinner.setModel(new javax.swing.SpinnerNumberModel());
+        endSpinner.setEnabled(false);
         endSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 endSpinnerStateChanged(evt);
@@ -286,7 +291,9 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_startSpinnerStateChanged
-        startMarker.setValue((Integer)startSpinnerModel.getValue());
+        final int start = (Integer)startSpinnerModel.getValue();
+        startMarker.setValue(start);
+        endSpinnerModel.setValue(start + MOVEMENT_LENGTH);
     }//GEN-LAST:event_startSpinnerStateChanged
 
     private void endSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_endSpinnerStateChanged
@@ -305,7 +312,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     }
     
     private BufferedWriter createFile(int command) throws IOException {
-        final String prefix = "movement_ " + command;
+        final String prefix = namePrefix + "_movement_ " + command;
         File[] existing = saveFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -334,7 +341,11 @@ public class CaptureEditFrame extends javax.swing.JFrame {
             int start = (Integer)startSpinnerModel.getValue();
             int end = (Integer)endSpinnerModel.getValue();
             
-            System.out.println("Saving from " + start + " to " + end);
+            System.out.println("Saving from " + start + " to " + end +
+                    "( => " + (end - start) + " samples");
+            if (end - start != MOVEMENT_LENGTH) {
+                System.out.println("Too short movement !");
+            }
             
             BufferedWriter saveWriter = createFile(command);
             
@@ -418,7 +429,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CaptureEditFrame("movements", accel1).setVisible(true);
+                new CaptureEditFrame("movements", "", accel1).setVisible(true);
             }
         });
     }
