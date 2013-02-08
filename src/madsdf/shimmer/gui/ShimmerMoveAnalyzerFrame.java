@@ -317,19 +317,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 FileWriter output = null;
-                try {
-                    float[][] accelData = chartsDrawer.getRecentAccelData();
-                    output = new FileWriter("/home/julien/tmp/movement.txt");
-                    new CaptureEditFrame(output, accelData).setVisible(true);
-                } catch (IOException ex) {
-                    Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        output.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+                float[][] accelData = chartsDrawer.getRecentAccelData();
+                new CaptureEditFrame("movements", accelData).setVisible(true);
             }
         });
     }//GEN-LAST:event_btnSaveActionPerformed

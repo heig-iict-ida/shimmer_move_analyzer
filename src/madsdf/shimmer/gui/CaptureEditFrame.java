@@ -9,9 +9,11 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -19,6 +21,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
@@ -51,7 +55,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private ValueMarker startMarker;
     private ValueMarker endMarker;
     
-    private BufferedWriter saveWriter;
+    private File saveFolder;
     
     private float[][] accelData;
     
@@ -69,12 +73,14 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     /**
      * Creates new form CaptureEditFrame
      */
-    public CaptureEditFrame(Writer saveWriter, float[][] accel) {
+    public CaptureEditFrame(String saveDir, float[][] accel) {
         checkState(accel.length == 3);
         initComponents();
         
-        this.saveWriter = new BufferedWriter(saveWriter);
+        this.saveFolder = new File(saveDir);
         this.accelData = arrCopy(accel);
+        
+        saveFolder.mkdirs();
         
         XYSeriesCollection accelCol = new XYSeriesCollection();
         accelSeries[0] = new XYSeries("X", true, false);
@@ -104,8 +110,6 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         endSpinnerModel.setValue(accel[0].length - 1);
         spinnerSetCommitOnEdit(startSpinner);
         spinnerSetCommitOnEdit(endSpinner);
-        
-
         
         chart = ChartFactory.createXYLineChart(
                 "Acceleration",
@@ -300,6 +304,30 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         w.write("\n");
     }
     
+    private BufferedWriter createFile(int command) throws IOException {
+        final String prefix = "movement_ " + command;
+        File[] existing = saveFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith(prefix);
+            }
+        });
+        // Find the maximum sample number in existing files
+        Pattern fpat = Pattern.compile(prefix + "_(\\d+).txt");
+        int maxSample = 0;
+        for (File f: existing) {
+            final Matcher m = fpat.matcher(f.getName());
+            if (m.matches()) {
+                final int num = Integer.parseInt(m.group(1));
+                maxSample = Math.max(maxSample, num);
+            }
+        }
+        
+        final String fname = prefix + "_" + (maxSample + 1) + ".txt";
+        return new BufferedWriter(
+                new FileWriter(saveFolder.getAbsolutePath() + "/" + fname));
+    }
+    
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         try {
             int command = (Integer)((SpinnerNumberModel)commandSpinner.getModel()).getValue();
@@ -307,6 +335,8 @@ public class CaptureEditFrame extends javax.swing.JFrame {
             int end = (Integer)endSpinnerModel.getValue();
             
             System.out.println("Saving from " + start + " to " + end);
+            
+            BufferedWriter saveWriter = createFile(command);
             
             // TODO: Should increment sample number ?
             saveWriter.write("COMMAND " + command + " SAMPLE 1\n");
@@ -318,7 +348,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
             writeAxis(saveWriter, "Gyro X", Arrays.copyOfRange(accelData[0], start, end));
             writeAxis(saveWriter, "Gyro Y", Arrays.copyOfRange(accelData[1], start, end));
             writeAxis(saveWriter, "Gyro Z", Arrays.copyOfRange(accelData[2], start, end));
-            saveWriter.flush();
+            saveWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(CaptureEditFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -385,12 +415,10 @@ public class CaptureEditFrame extends javax.swing.JFrame {
              1948}
         };
         
-        final FileWriter output = new FileWriter("/home/julien/tmp/movement.txt");
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CaptureEditFrame(output, accel1).setVisible(true);
+                new CaptureEditFrame("movements", accel1).setVisible(true);
             }
         });
     }
