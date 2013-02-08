@@ -312,7 +312,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     }
     
     private BufferedWriter createFile(int command) throws IOException {
-        final String prefix = namePrefix + "_movement_ " + command;
+        final String prefix = namePrefix + "_movement_" + command;
         File[] existing = saveFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
