@@ -142,8 +142,7 @@ public class ChartsDrawer {
       axisGyro.setTickLabelsVisible(false);
    }
    
-   @Subscribe
-   public void onSample(AccelGyro.UncalibratedSample sample) {
+   public void addSample(AccelGyro.Sample sample) {
       // Add the sample in the complete list
       receivedValues.add(sample);
       
@@ -180,7 +179,7 @@ public class ChartsDrawer {
     */
    private void addSampleToChart(AccelGyro.Sample sample) {
       
-      // Add the sample in the list, maintening SAMPLE_SIZE sample
+      // Add the sample in the list, keeping SAMPLE_SIZE sample
       if (getLastHundred().size() == SAMPLE_SIZE) {
          getLastHundred().remove();
       }

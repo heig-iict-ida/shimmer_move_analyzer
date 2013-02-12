@@ -1,6 +1,7 @@
 package madsdf.shimmer.gui;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import madsdf.shimmer.glview.ShimmerAngleConverter;
 import madsdf.shimmer.glview.ShimmerCanvas;
 import java.awt.Cursor;
@@ -59,6 +60,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     private final Logger log = Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName());
     
     private final EventBus eventBus;
+    private Object sampleListener;
 
     /**
      * Creates new form ShimmerMoveAnalyzerFrame
@@ -72,7 +74,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         setTitle(title);
         /*prefs = Preferences.userRoot().node(this.getClass().getName());
         restorePreferences();*/
-        chartsDrawer = new ChartsDrawer((ChartPanel) panAccel, (ChartPanel) panGyro);
+        
         
         final ShimmerCanvas shimmerCanvas = (ShimmerCanvas)panGL;
         eventBus = Globals.getBusForShimmer(btid);
@@ -80,7 +82,6 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         
         // Eventbus registration
         eventBus.register(shimmerCanvas);
-        eventBus.register(chartsDrawer);
         eventBus.register(angleConverter);
         
         txtLog.setEditable(false);
@@ -90,7 +91,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         // Automatically start streaming
         // TODO: This is DEBUG only
         connect();
-        chartsDrawer.setDrawing(true);
+        setCalibratedChart(cbCalibrated.isSelected());
     }
     
     /*private void restorePreferences() {
@@ -123,6 +124,34 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    private void setCalibratedChart(boolean calibrated) {
+        // Replace sample listener
+        if (sampleListener != null) {
+            eventBus.unregister(sampleListener);
+        }
+        
+        // TODO: Create new chart drawer
+        chartsDrawer = new ChartsDrawer((ChartPanel) panAccel, (ChartPanel) panGyro);
+        chartsDrawer.setDrawing(true);
+        
+        if (calibrated) {
+            sampleListener  = new Object() {
+                @Subscribe
+                public void onSample(AccelGyro.CalibratedSample sample) {
+                    chartsDrawer.addSample(sample);
+                }
+            };
+        } else {
+            sampleListener  = new Object() {
+                @Subscribe
+                public void onSample(AccelGyro.UncalibratedSample sample) {
+                    chartsDrawer.addSample(sample);
+                }
+            };
+        }
+        eventBus.register(sampleListener);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -139,6 +168,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         jPanelConnect = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         labBtId = new javax.swing.JLabel();
+        cbCalibrated = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         panAccel = new ChartPanel(null);
         panGyro = new ChartPanel(null);
@@ -198,6 +228,13 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
 
         labBtId.setText("jLabel1");
 
+        cbCalibrated.setText("Calibrated");
+        cbCalibrated.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbCalibratedActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelConnectLayout = new javax.swing.GroupLayout(jPanelConnect);
         jPanelConnect.setLayout(jPanelConnectLayout);
         jPanelConnectLayout.setHorizontalGroup(
@@ -207,7 +244,9 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(labBtId)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cbCalibrated)
+                .addContainerGap())
         );
         jPanelConnectLayout.setVerticalGroup(
             jPanelConnectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -215,7 +254,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
                 .addContainerGap()
                 .addGroup(jPanelConnectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(labBtId))
+                    .addComponent(labBtId)
+                    .addComponent(cbCalibrated))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -231,7 +271,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         );
         panAccelLayout.setVerticalGroup(
             panAccelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 193, Short.MAX_VALUE)
+            .addGap(0, 191, Short.MAX_VALUE)
         );
 
         jPanel2.add(panAccel);
@@ -246,7 +286,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         );
         panGyroLayout.setVerticalGroup(
             panGyroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 193, Short.MAX_VALUE)
+            .addGap(0, 191, Short.MAX_VALUE)
         );
 
         jPanel2.add(panGyro);
@@ -259,7 +299,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         );
         panGLLayout.setVerticalGroup(
             panGLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 193, Short.MAX_VALUE)
+            .addGap(0, 191, Short.MAX_VALUE)
         );
 
         jPanel2.add(panGL);
@@ -293,7 +333,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
                 .addContainerGap()
                 .addComponent(jPanelConnect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -322,6 +362,10 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             }
         });
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void cbCalibratedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCalibratedActionPerformed
+        setCalibratedChart(cbCalibrated.isSelected());
+    }//GEN-LAST:event_cbCalibratedActionPerformed
 
     /**
      * @param args the command line arguments
@@ -373,6 +417,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnStop;
+    private javax.swing.JCheckBox cbCalibrated;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
