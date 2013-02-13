@@ -39,18 +39,5 @@ public class AccelGyro {
         public UncalibratedSample(long time, float[] accel, float[] gyro) {
             super(time, accel, gyro);
         }
-        
-        // TODO: Remove : this is only for backward-compatibility
-        public float getVal(int i) {
-            if (i < 1 || i > 6) {
-                throw new IllegalArgumentException("Invaild i : " + i);
-            }
-            if (i <= 3) {
-                return accel[i - 1];
-            } else {
-                return gyro[i - 4];
-            }
-            
-        }
     }
 }
