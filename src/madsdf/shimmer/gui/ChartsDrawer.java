@@ -40,10 +40,17 @@ import org.jfree.data.time.TimeSeriesCollection;
 public class ChartsDrawer {
     // Range policy that returns the all-time max/min
 
-    private static class RangePolicyMaxSeen extends ARangePolicy {
-
-        private double min = Double.MAX_VALUE;
-        private double max = Double.MIN_VALUE;
+    public static class RangePolicyMaxSeen extends ARangePolicy {
+        private double min;
+        private double max;
+        
+        public RangePolicyMaxSeen() {
+            this(Double.MAX_VALUE, Double.MIN_VALUE);
+        }
+        
+        public RangePolicyMaxSeen(double min, double max) {
+            super();
+        }
 
         @Override
         public double getMax(double chartMin, double chartMax) {
@@ -60,7 +67,7 @@ public class ChartsDrawer {
     private final ConcurrentLinkedDeque<AccelGyro.Sample> receivedValues =
             new ConcurrentLinkedDeque();
     final int N_KEPT = 400;
-    private final static Color[] colors = new Color[]{
+    public final static Color[] colors = new Color[]{
         Color.RED, Color.GREEN, Color.BLUE, Color.BLACK,
         Color.CYAN, Color.DARK_GRAY, Color.MAGENTA,
         Color.ORANGE, Color.PINK, Color.YELLOW,
