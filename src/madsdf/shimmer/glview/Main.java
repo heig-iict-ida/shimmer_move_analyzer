@@ -20,16 +20,12 @@ import javax.swing.SwingUtilities;
 public class Main {
     private static final int CANVAS_WIDTH = 320;  // width of the drawable
     private static final int CANVAS_HEIGHT = 240; // height of the drawable
-    private static final int FPS = 60; // animator's target frames per second
 
     public static void main(String[] args) {
         // Run the GUI codes in the event-dispatching thread for thread safety
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // Create a animator that drives canvas' display() at the specified FPS. 
-                //final FPSAnimator animator = new FPSAnimator(canvas, FPS, true);
-
                 // Create the top-level container
                 final JFrame frame = new JFrame(); // Swing's JFrame or AWT's Frame
                 ShimmerCanvas canvas = ShimmerCanvas.createCanvas(frame);
@@ -38,7 +34,6 @@ public class Main {
                 frame.setTitle("Shimmer");
                 frame.pack();
                 frame.setVisible(true);
-                //animator.start(); // start the animation loop
             }
         });
     }
