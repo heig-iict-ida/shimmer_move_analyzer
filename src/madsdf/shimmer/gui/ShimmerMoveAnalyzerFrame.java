@@ -2,6 +2,7 @@ package madsdf.shimmer.gui;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import info.monitorenter.gui.chart.Chart2D;
 import madsdf.shimmer.glview.ShimmerAngleConverter;
 import madsdf.shimmer.glview.ShimmerCanvas;
 import java.awt.Cursor;
@@ -131,9 +132,7 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             eventBus.unregister(sampleListener);
         }
         
-        // TODO: Create new chart drawer
-        chartsDrawer = new ChartsDrawer((ChartPanel) panAccel, (ChartPanel) panGyro);
-        chartsDrawer.setDrawing(true);
+        chartsDrawer = new ChartsDrawer((Chart2D) panAccel, (Chart2D) panGyro);
         
         if (calibrated) {
             sampleListener  = new Object() {
@@ -163,15 +162,14 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     private void initComponents() {
 
         jPanel5 = new javax.swing.JPanel();
-        btnStop = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         jPanelConnect = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         labBtId = new javax.swing.JLabel();
         cbCalibrated = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
-        panAccel = new ChartPanel(null);
-        panGyro = new ChartPanel(null);
+        panAccel = new Chart2D();
+        panGyro = new Chart2D();
         panGL = ShimmerCanvas.createCanvas(this);
         panLog = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextArea();
@@ -189,13 +187,6 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             }
         });
 
-        btnStop.setText("Stop");
-        btnStop.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStopActionPerformed(evt);
-            }
-        });
-
         btnSave.setText("Save");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -210,17 +201,13 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnSave)
-                .addGap(18, 18, 18)
-                .addComponent(btnStop)
-                .addContainerGap(351, Short.MAX_VALUE))
+                .addContainerGap(436, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnStop)
-                    .addComponent(btnSave))
+                .addComponent(btnSave)
                 .addContainerGap(45, Short.MAX_VALUE))
         );
 
@@ -342,11 +329,6 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-   private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
-       btnStop.setEnabled(false);
-       chartsDrawer.setDrawing(false);
-   }//GEN-LAST:event_btnStopActionPerformed
-
    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
        if (connectedDevice != null) {
            connectedDevice.stop();
@@ -417,7 +399,6 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnStop;
     private javax.swing.JCheckBox cbCalibrated;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
