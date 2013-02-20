@@ -50,6 +50,8 @@ public class ChartsDrawer {
         
         public RangePolicyMaxSeen(double min, double max) {
             super();
+            this.min = min;
+            this.max = max;
         }
 
         @Override
