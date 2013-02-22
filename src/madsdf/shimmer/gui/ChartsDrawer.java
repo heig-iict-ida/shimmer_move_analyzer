@@ -110,10 +110,13 @@ public class ChartsDrawer {
         }
 
         IAxis yAxis = chart.getAxisY();
-        yAxis.setAxisTitle(new AxisTitle(yAxisLabel));
+        //yAxis.setAxisTitle(new AxisTitle(yAxisLabel));
+        yAxis.setPaintScale(true);
+        yAxis.getAxisTitle().setTitle(null);
         yAxis.setRangePolicy(new RangePolicyMaxSeen());
         IAxis xAxis = chart.getAxisX();
-        xAxis.setVisible(false);
+        xAxis.setPaintScale(false);
+        xAxis.getAxisTitle().setTitle(null);
     }
 
     public void addSample(AccelGyro.Sample sample) {
