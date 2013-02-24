@@ -73,9 +73,9 @@ public class ChartsDrawer {
         Color.RED, Color.GREEN, Color.BLUE, Color.BLACK,
         Color.CYAN, Color.DARK_GRAY, Color.MAGENTA,
         Color.ORANGE, Color.PINK, Color.YELLOW,
-        ChartColor.VERY_DARK_RED, ChartColor.VERY_DARK_BLUE,
-        ChartColor.VERY_DARK_CYAN, ChartColor.VERY_DARK_GREEN,
-        ChartColor.VERY_DARK_YELLOW
+        ChartColor.VERY_LIGHT_CYAN, ChartColor.VERY_LIGHT_BLUE,
+        ChartColor.VERY_LIGHT_RED, ChartColor.VERY_LIGHT_GREEN,
+        ChartColor.VERY_LIGHT_YELLOW
     };
     private ITrace2D[] accelTraces = new ITrace2D[]{
         new Trace2DLtd(100),

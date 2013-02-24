@@ -50,7 +50,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private XYSeries[] accelSeries = new XYSeries[3];
     private JFreeChart chart;
     
-    private final int MOVEMENT_LENGTH = 150;
+    private final int MOVEMENT_LENGTH = 75;
     
     private SpinnerNumberModel startSpinnerModel;
     private SpinnerNumberModel endSpinnerModel;
