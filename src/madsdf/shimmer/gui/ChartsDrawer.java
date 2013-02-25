@@ -10,8 +10,10 @@ import info.monitorenter.gui.chart.IAxis.AxisTitle;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.rangepolicies.ARangePolicy;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Paint;
+import java.awt.Stroke;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -69,14 +71,30 @@ public class ChartsDrawer {
     private final ConcurrentLinkedDeque<AccelGyro.Sample> receivedValues =
             new ConcurrentLinkedDeque();
     final int N_KEPT = 400;
+    
+    // Pairs of (color, stroke) to use to get consistent drawing based on serie
+    // id across application
     public final static Color[] colors = new Color[]{
         Color.RED, Color.GREEN, Color.BLUE, Color.BLACK,
-        Color.CYAN, Color.DARK_GRAY, Color.MAGENTA,
-        Color.ORANGE, Color.PINK, Color.YELLOW,
-        ChartColor.VERY_LIGHT_CYAN, ChartColor.VERY_LIGHT_BLUE,
-        ChartColor.VERY_LIGHT_RED, ChartColor.VERY_LIGHT_GREEN,
-        ChartColor.VERY_LIGHT_YELLOW
+        Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.YELLOW,
+        ChartColor.VERY_DARK_RED, ChartColor.VERY_DARK_GREEN,
+        ChartColor.VERY_DARK_BLUE, ChartColor.GRAY,
+        ChartColor.VERY_DARK_CYAN
     };
+    private final static Stroke contStroke = new BasicStroke(1.0f);
+    private final static Stroke dashStroke = new BasicStroke(1.0f,
+            BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
+            new float[]{10.0f}, 0.0f);
+    public final static Stroke[] strokes = new Stroke[]{
+        contStroke, contStroke, contStroke, contStroke,
+        contStroke, contStroke, contStroke,
+        contStroke, contStroke,
+        dashStroke, dashStroke,
+        dashStroke, dashStroke,
+        dashStroke
+    };
+    
+    
     private ITrace2D[] accelTraces = new ITrace2D[]{
         new Trace2DLtd(100),
         new Trace2DLtd(100),
@@ -107,6 +125,7 @@ public class ChartsDrawer {
             chart.addTrace(traces[i]);
             traces[i].setName(name + "_" + axesNames[i]);
             traces[i].setColor(colors[i]);
+            traces[i].setStroke(strokes[i]);
         }
 
         IAxis yAxis = chart.getAxisY();
