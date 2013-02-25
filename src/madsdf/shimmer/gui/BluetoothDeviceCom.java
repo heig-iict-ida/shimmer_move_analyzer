@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
+import madsdf.shimmer.shimmer_calib.Calibration;
 
 /**
  * Receive the information from the device and transmit them to the chart drawer
@@ -74,21 +75,8 @@ public class BluetoothDeviceCom implements Runnable {
     public BluetoothDeviceCom(EventBus ebus, String btDeviceID) throws IOException {
         this.ebus = ebus;
         // Load calibration
-        final String accelFilename = "/madsdf/shimmer/shimmer_calib/1_5_" + btDeviceID + ".accel.properties";
-        final String gyroFilename = "/madsdf/shimmer/shimmer_calib/1_5_" + btDeviceID + ".gyro.properties";
-        loadCalibration(accelFilename, accel_offset, accel_gain);
-        loadCalibration(gyroFilename, gyro_offset, gyro_gain);
-    }
-    
-    private void loadCalibration(String filename, float[] outOffset, float[] outGain) throws IOException {
-        Properties prop = new Properties();
-        prop.load(this.getClass().getResourceAsStream(filename));
-        outOffset[0] = Float.parseFloat(prop.getProperty("offset_x"));
-        outOffset[1] = Float.parseFloat(prop.getProperty("offset_y"));
-        outOffset[2] = Float.parseFloat(prop.getProperty("offset_z"));
-        outGain[0] = Float.parseFloat(prop.getProperty("gain_x"));
-        outGain[1] = Float.parseFloat(prop.getProperty("gain_y"));
-        outGain[2] = Float.parseFloat(prop.getProperty("gain_z"));
+        Calibration.loadAccelCalibration(btDeviceID, accel_offset, accel_gain);
+        Calibration.loadGyroCalibration(btDeviceID, gyro_offset, gyro_gain);
     }
 
     public void connect(String connectionURL) throws IOException {
@@ -108,7 +96,7 @@ public class BluetoothDeviceCom implements Runnable {
         float[] accel = new float[3];
         float[] gyro = new float[3];
         for (int i = 0; i < 3; ++i) {
-            accel[i] = ((s.accel[i] - accel_offset[i]) / accel_gain[i]) * 9.81f;
+            accel[i] = (s.accel[i] - accel_offset[i]) / accel_gain[i];
         }
         for (int i = 0; i < 3; ++i) {
             gyro[i] = (s.gyro[i] - gyro_offset[i]) / gyro_gain[i];
