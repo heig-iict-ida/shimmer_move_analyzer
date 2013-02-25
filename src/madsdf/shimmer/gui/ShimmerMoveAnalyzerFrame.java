@@ -389,8 +389,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
          * Create and display the form
          */
         // TODO: Get that from properties file
-        //final String btid = "BDCD";
-        final String btid = "9EDB";
+        final String btid = "BDCD";
+        //final String btid = "9EDB";
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ShimmerMoveAnalyzerFrame("Shimmer", btid).setVisible(true);
