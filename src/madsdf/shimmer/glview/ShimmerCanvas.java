@@ -26,6 +26,7 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
@@ -106,27 +107,21 @@ public class ShimmerCanvas extends GLJPanel implements GLEventListener {
     private final int NEG_Z = 5;
     private Texture[] cubeTextures = new Texture[6];
     
+    private FPSAnimator animator;
+    
     // Factory method
-    public static ShimmerCanvas createCanvas(JFrame frame) {
+    public static ShimmerCanvas createCanvas(JPanel panel) {
         ShimmerCanvas c = new ShimmerCanvas();
         c.addGLEventListener(c);
         c.addMouseListener(c.inputHandler);
         c.addMouseMotionListener(c.inputHandler);
-        
-        // Add the animator
-        final FPSAnimator animator = new FPSAnimator(c, 60);
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                new Thread() {
-                    public void run() {
-                        animator.stop();
-                        System.exit(0);
-                    }
-                }.start();
-            }
-        });
-        animator.start();
+        c.animator = new FPSAnimator(c, 30);
+        c.animator.start();
         return c;
+    }
+    
+    public void stop() {
+        animator.stop();
     }
     
     private ShimmerCanvas() {}

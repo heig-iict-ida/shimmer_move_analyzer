@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
@@ -87,7 +88,7 @@ public class BluetoothDeviceCom implements Runnable {
 
         thread = new Thread(this);
         thread.start();
-        Log.info("Connected to " + connectionURL);
+        Log.log(Level.INFO, "Connected to {0}", connectionURL);
     }
     
     private AccelGyro.CalibratedSample
@@ -195,6 +196,7 @@ public class BluetoothDeviceCom implements Runnable {
         try {
             os.write(STOP_STREAMING_COMMAND);
             os.close();
+            is.close();
             bluetoothConnection.close();
         } catch (IOException ex) {
             System.err.print("BluetoothDeviceCom.stop : " + ex);

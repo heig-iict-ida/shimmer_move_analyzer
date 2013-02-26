@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -28,7 +29,9 @@ public class Main {
             public void run() {
                 // Create the top-level container
                 final JFrame frame = new JFrame(); // Swing's JFrame or AWT's Frame
-                ShimmerCanvas canvas = ShimmerCanvas.createCanvas(frame);
+                final JPanel panel = new JPanel();
+                frame.getContentPane().add(panel);
+                ShimmerCanvas canvas = ShimmerCanvas.createCanvas(panel);
                 canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
                 frame.getContentPane().add(canvas);
                 frame.setTitle("Shimmer");
