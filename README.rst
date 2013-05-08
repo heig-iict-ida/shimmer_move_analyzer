@@ -9,3 +9,11 @@ window that will be saved to a text file to be used as a template later on.
 
 .. image:: docs/images/capture_window_small.png
 
+Credits
+.......
+Copyright 2013 HEIG-VD
+
+Written by Grégoire Aubert and Julien Rebetez
+
+With advices from Andres Perez-Uribe and Héctor Satizábal
+
