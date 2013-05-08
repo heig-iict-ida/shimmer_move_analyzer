@@ -1,5 +1,5 @@
-Gesture templates recording
-...........................
+Shimmer Move Analyzer
+.....................
 To record gesture templates, the `ShimmerMoveAnalyzer` program can be used. It
 allows one to stream accelerometer data from a Shimmer (with the Boilerplate firmware)
 over Bluetooth. By clicking on the save button, the user can choose the data
