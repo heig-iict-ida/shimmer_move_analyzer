@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.swing.SpinnerNumberModel;
 import madsdf.shimmer.event.Globals;
 import madsdf.shimmer.glview.ShimmerAngleConverter;
 import madsdf.shimmer.glview.ShimmerCanvas;
@@ -24,9 +25,13 @@ import madsdf.shimmer.glview.ShimmerCanvas;
 public class ShimmerDataPanel extends javax.swing.JPanel {
     private static final Logger log = Logger.getLogger(ShimmerDataPanel.class.getName());
     
+    private final int DEFAULT_MOVEMENT_LENGTH = 75;
+    
     private BluetoothDeviceCom connectedDevice;
     private final EventBus eventBus;
     private final String btid;
+    
+    private SpinnerNumberModel lenSpinnerModel;
 
     // The class drawing the chart
     private ChartsDrawer chartsDrawer;
@@ -43,6 +48,9 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
         shimmerCanvas = (ShimmerCanvas)panGL;
         eventBus = Globals.getBusForShimmer(btid);
         angleConverter = new ShimmerAngleConverter(eventBus, txtLog);
+        
+        lenSpinnerModel = (SpinnerNumberModel) lenSpinner.getModel();
+        lenSpinnerModel.setValue(DEFAULT_MOVEMENT_LENGTH);
         
         // Eventbus registration
         eventBus.register(shimmerCanvas);
@@ -137,6 +145,8 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
         btnSave = new javax.swing.JButton();
         cbCalibrated = new javax.swing.JCheckBox();
         labBtId = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        lenSpinner = new javax.swing.JSpinner();
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 2, 5, 5));
 
@@ -146,11 +156,11 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
         panAccel.setLayout(panAccelLayout);
         panAccelLayout.setHorizontalGroup(
             panAccelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 223, Short.MAX_VALUE)
+            .addGap(0, 245, Short.MAX_VALUE)
         );
         panAccelLayout.setVerticalGroup(
             panAccelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 202, Short.MAX_VALUE)
+            .addGap(0, 207, Short.MAX_VALUE)
         );
 
         jPanel2.add(panAccel);
@@ -161,11 +171,11 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
         panGyro.setLayout(panGyroLayout);
         panGyroLayout.setHorizontalGroup(
             panGyroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 223, Short.MAX_VALUE)
+            .addGap(0, 245, Short.MAX_VALUE)
         );
         panGyroLayout.setVerticalGroup(
             panGyroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 202, Short.MAX_VALUE)
+            .addGap(0, 207, Short.MAX_VALUE)
         );
 
         jPanel2.add(panGyro);
@@ -174,11 +184,11 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
         panGL.setLayout(panGLLayout);
         panGLLayout.setHorizontalGroup(
             panGLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 223, Short.MAX_VALUE)
+            .addGap(0, 245, Short.MAX_VALUE)
         );
         panGLLayout.setVerticalGroup(
             panGLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 202, Short.MAX_VALUE)
+            .addGap(0, 207, Short.MAX_VALUE)
         );
 
         jPanel2.add(panGL);
@@ -206,28 +216,43 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
 
         labBtId.setText("jLabel1");
 
+        jLabel1.setText("Movement length");
+
+        lenSpinner.setModel(new javax.swing.SpinnerNumberModel());
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnSave)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(labBtId)
-                .addGap(96, 96, 96)
-                .addComponent(cbCalibrated)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lenSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnSave)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labBtId)
+                        .addGap(96, 96, 96)
+                        .addComponent(cbCalibrated)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(lenSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSave)
                     .addComponent(cbCalibrated)
                     .addComponent(labBtId))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -245,19 +270,20 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        final int length = (Integer)lenSpinnerModel.getValue();
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 FileWriter output = null;
                 float[][] accelData = chartsDrawer.getRecentAccelData();
-                new CaptureEditFrame("movements", btid, accelData).setVisible(true);
+                new CaptureEditFrame("movements", btid, accelData, length).setVisible(true);
             }
         });
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -269,9 +295,11 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSave;
     private javax.swing.JCheckBox cbCalibrated;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel labBtId;
+    private javax.swing.JSpinner lenSpinner;
     private javax.swing.JPanel panAccel;
     private javax.swing.JPanel panGL;
     private javax.swing.JPanel panGyro;

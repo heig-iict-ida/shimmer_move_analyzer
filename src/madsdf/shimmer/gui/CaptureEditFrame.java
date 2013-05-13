@@ -50,8 +50,6 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private XYSeries[] accelSeries = new XYSeries[3];
     private JFreeChart chart;
     
-    private final int MOVEMENT_LENGTH = 75;
-    
     private SpinnerNumberModel startSpinnerModel;
     private SpinnerNumberModel endSpinnerModel;
     private ValueMarker startMarker;
@@ -61,6 +59,8 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private final String namePrefix;
     
     private float[][] accelData;
+    
+    private final int length;
     
     private static float[][] arrCopy(float[][] arr) {
         float[][] out = new float[arr.length][];
@@ -76,10 +76,11 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     /**
      * Creates new form CaptureEditFrame
      */
-    public CaptureEditFrame(String saveDir, String namePrefix, float[][] accel) {
+    public CaptureEditFrame(String saveDir, String namePrefix, float[][] accel, int length) {
         checkState(accel.length == 3);
         initComponents();
         
+        this.length = length;
         this.namePrefix = namePrefix;
         this.saveFolder = new File(saveDir);
         this.accelData = arrCopy(accel);
@@ -111,7 +112,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         startSpinnerModel.setMaximum(accel[0].length - 1);
         endSpinnerModel.setMinimum(0);
         endSpinnerModel.setMaximum(accel[0].length - 1);
-        endSpinnerModel.setValue(Math.max(MOVEMENT_LENGTH, accel[0].length - 1));
+        endSpinnerModel.setValue(Math.max(length, accel[0].length - 1));
         spinnerSetCommitOnEdit(startSpinner);
         spinnerSetCommitOnEdit(endSpinner);
         
@@ -293,7 +294,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private void startSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_startSpinnerStateChanged
         final int start = (Integer)startSpinnerModel.getValue();
         startMarker.setValue(start);
-        endSpinnerModel.setValue(start + MOVEMENT_LENGTH);
+        endSpinnerModel.setValue(start + length);
     }//GEN-LAST:event_startSpinnerStateChanged
 
     private void endSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_endSpinnerStateChanged
@@ -343,7 +344,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
             
             System.out.println("Saving from " + start + " to " + end +
                     "( => " + (end - start) + " samples");
-            if (end - start != MOVEMENT_LENGTH) {
+            if (end - start != length) {
                 System.out.println("Too short movement !");
             }
             
@@ -429,7 +430,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CaptureEditFrame("movements", "", accel1).setVisible(true);
+                new CaptureEditFrame("movements", "", accel1, 75).setVisible(true);
             }
         });
     }
