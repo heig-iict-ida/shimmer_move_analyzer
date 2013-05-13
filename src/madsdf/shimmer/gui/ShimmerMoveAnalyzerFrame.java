@@ -215,7 +215,8 @@ public class ShimmerMoveAnalyzerFrame extends JFrame {
         // TODO: Get that from properties file
         final String btid = "BDCD";
         //final String btid = "9EDB";
-        final String[] allbtid = new String[]{"BDCD", "9EDB", "B4D5", "B414"};
+        final String[] allbtid = new String[]{"9EDB", "B3FB", "B4D5", "B5EE",
+            "B414", "BCAD", "BD62", "BD89", "BDB2", "BDCD", "BDFA"};
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ShimmerMoveAnalyzerFrame("Shimmer", btid, allbtid).setVisible(true);

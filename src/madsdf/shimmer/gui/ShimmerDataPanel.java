@@ -59,6 +59,7 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
                 connect();
             }
         }.start();
+        
         setCalibratedChart(cbCalibrated.isSelected());
     }
     
@@ -69,13 +70,24 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
     
     private void connect() {
         try {
-            log.info("Connecting to shimmer...");
+            log.info("Connecting to shimmer " + btid + "...");
             final String btServiceID = "btspp://00066646" + btid + ":1;authenticate=false;encrypt=false;master=false";
             connectedDevice = new BluetoothDeviceCom(eventBus, btid);
             connectedDevice.connect(btServiceID);
+            
+            if (!connectedDevice.isCalibrated()) {
+                log.info("No calibration available");
+                cbCalibrated.setSelected(false);
+                setCalibratedChart(false);
+                cbCalibrated.setEnabled(false);
+            } else {
+                log.info("Calibration available");
+                cbCalibrated.setEnabled(true);
+            }
+            
             log.info("Connected to shimmer");
         } catch (IOException ex) {
-            Logger.getLogger(ShimmerMoveAnalyzerFrame.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, "Couldn't connect to : " + btid + " : " + ex.getMessage());
         }
     }
     

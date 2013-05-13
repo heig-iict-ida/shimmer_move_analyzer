@@ -57,6 +57,9 @@ public class BluetoothDeviceCom implements Runnable {
     byte[] packetReceive = new byte[240];
     private boolean continueRead = true;
     
+    // Indicate if calibration is available for this device
+    private final boolean calibrated;
+    
     // Accel/gyro sample packet type
     public final byte DATA_TYPE = 0x00;
     
@@ -76,8 +79,9 @@ public class BluetoothDeviceCom implements Runnable {
     public BluetoothDeviceCom(EventBus ebus, String btDeviceID) throws IOException {
         this.ebus = ebus;
         // Load calibration
-        Calibration.loadAccelCalibration(btDeviceID, accel_offset, accel_gain);
-        Calibration.loadGyroCalibration(btDeviceID, gyro_offset, gyro_gain);
+        boolean ok = Calibration.loadAccelCalibration(btDeviceID, accel_offset, accel_gain);
+        ok &= Calibration.loadGyroCalibration(btDeviceID, gyro_offset, gyro_gain);
+        calibrated = ok;
     }
 
     public void connect(String connectionURL) throws IOException {
@@ -128,6 +132,10 @@ public class BluetoothDeviceCom implements Runnable {
                     + ByteUtils.getHexString(sample, sample.length));
         }
         return new AccelGyro.UncalibratedSample(time, accel, gyro);
+    }
+    
+    public boolean isCalibrated() {
+        return calibrated;
     }
     
     private void sendCommand(byte... commands) throws IOException {
@@ -194,10 +202,16 @@ public class BluetoothDeviceCom implements Runnable {
     public void stop() {
         continueRead = false;
         try {
-            os.write(STOP_STREAMING_COMMAND);
-            os.close();
-            is.close();
-            bluetoothConnection.close();
+            if (os != null) {
+                os.write(STOP_STREAMING_COMMAND);
+                os.close();
+            }
+            if (is != null) {
+                is.close();
+            }
+            if (bluetoothConnection != null) {
+                bluetoothConnection.close();
+            }
         } catch (IOException ex) {
             System.err.print("BluetoothDeviceCom.stop : " + ex);
         }
