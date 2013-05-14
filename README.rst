@@ -9,6 +9,12 @@ window that will be saved to a text file to be used as a template later on.
 
 .. image:: docs/images/capture_window_small.png
 
+Running
+.......
+This requires Java 1.7.
+
+On Windows/OSX, bluecove (used for bluetooth communication) requires a 32bit JVM. So if you get a bluecove error when running, add the '-d32' option to the java command.
+
 Credits
 .......
 Copyright 2013 HEIG-VD
