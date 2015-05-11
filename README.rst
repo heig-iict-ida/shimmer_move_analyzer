@@ -1,5 +1,5 @@
 Shimmer Move Analyzer
-.....................
+=====================
 To record gesture templates, the `ShimmerMoveAnalyzer` program can be used. It
 allows one to stream accelerometer data from a Shimmer (with the Boilerplate firmware)
 over Bluetooth. By clicking on the save button, the user can choose the data
@@ -10,12 +10,24 @@ window that will be saved to a text file to be used as a template later on.
 .. image:: docs/images/capture_window_small.png
 
 Running
-.......
+=======
 This requires Java 1.7.
 
-On Linux you need to install libbluetooth-dev.
+Linux
+-----
+On Linux you need to install libbluetooth-dev (or a similar package providing
+libbluetooth.so).
 
-On Windows/OSX, bluecove (used for bluetooth communication) requires a 32bit JVM. So if you get a bluecove error when running, add the '-d32' option to the java command.
+Windows
+-------
+On Windows, bluecove (used for bluetooth communication) requires a 32bit JVM.
+So if you get a bluecove error when running, add the '-d32' option to the
+java command.
+
+OSX
+---
+On OSX before 10.9, you probably need to run the jar with '-d32' (see the
+Windows remark just above)
 
 This does **not** work on OSX 10.9 due to the following bluecove issues :
 
@@ -24,7 +36,7 @@ http://stackoverflow.com/questions/21957282/bluecove-on-mac-os-10-9
 https://code.google.com/p/bluecove/issues/detail?id=134
 
 Credits
-.......
+=======
 Copyright 2013 HEIG-VD
 
 Written by Grégoire Aubert and Julien Rebetez
@@ -32,7 +44,7 @@ Written by Grégoire Aubert and Julien Rebetez
 With advices from Andres Perez-Uribe and Héctor Satizábal
 
 License
-.......
+=======
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
