@@ -154,12 +154,24 @@ public class ChartsDrawer {
         gyroTraces[1].addPoint(now, sample.gyro[1]);
         gyroTraces[2].addPoint(now, sample.gyro[2]);
     }
+    
+    static class Data {
+        public float[][] accel;
+        public float[][] gyro;
+        
+        public Data(float[][] accel, float[][] gyro) {
+            this.accel = accel;
+            this.gyro = gyro;
+        }
+    }
 
-    public float[][] getRecentAccelData() {
-        float[][] data = new float[3][];
-        data[0] = new float[N_KEPT];
-        data[1] = new float[N_KEPT];
-        data[2] = new float[N_KEPT];
+    public Data getRecentData() {
+        float[][] accelData = new float[3][];
+        float[][] gyroData = new float[3][];
+        for (int i = 0; i < 3; ++i) {
+            accelData[i] = new float[N_KEPT];
+            gyroData[i] = new float[N_KEPT];
+        }
 
         ArrayList<AccelGyro.Sample> allSamples = Lists.newArrayList(receivedValues);
 
@@ -167,10 +179,11 @@ public class ChartsDrawer {
         int datai = 0;
         for (int i = start; i < allSamples.size(); ++i) {
             for (int j = 0; j < 3; ++j) {
-                data[j][datai] = allSamples.get(i).accel[j];
+                accelData[j][datai] = allSamples.get(i).accel[j];
+                gyroData[j][datai] = allSamples.get(i).gyro[j];
             }
             ++datai;
         }
-        return data;
+        return new Data(accelData, gyroData);
     }
 }

@@ -48,7 +48,9 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class CaptureEditFrame extends javax.swing.JFrame {
     private XYSeries[] accelSeries = new XYSeries[3];
-    private JFreeChart chart;
+    private JFreeChart accelChart;
+    private XYSeries[] gyroSeries = new XYSeries[3];
+    private JFreeChart gyroChart;
     
     private SpinnerNumberModel startSpinnerModel;
     private SpinnerNumberModel endSpinnerModel;
@@ -59,6 +61,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private final String namePrefix;
     
     private float[][] accelData;
+    private float[][] gyroData;
     
     private final int length;
     
@@ -75,36 +78,40 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     
     /**
      * Creates new form CaptureEditFrame
+     * - accel, gyro : 3xn arrays of values
      */
-    public CaptureEditFrame(String saveDir, String namePrefix, float[][] accel, int length) {
+    public CaptureEditFrame(String saveDir, String namePrefix, float[][] accel, float[][] gyro, int length) {
         checkState(accel.length == 3);
+        checkState(accel[0].length == gyro[0].length);
         initComponents();
         
         this.length = length;
         this.namePrefix = namePrefix;
         this.saveFolder = new File(saveDir);
         this.accelData = arrCopy(accel);
+        this.gyroData = arrCopy(gyro);
         
         saveFolder.mkdirs();
-        
-        XYSeriesCollection accelCol = new XYSeriesCollection();
-        accelSeries[0] = new XYSeries("X", true, false);
-        accelCol.addSeries(accelSeries[0]);
-        accelSeries[1] = new XYSeries("Y", true, false);
-        accelCol.addSeries(accelSeries[1]);
-        accelSeries[2] = new XYSeries("Z", true, false);
-        accelCol.addSeries(accelSeries[2]);
-        
-        for (int i = 0; i < accel.length; ++i) {
-            for (int j = 0; j < accel[i].length; ++j) {
-                accelSeries[i].add(j, accel[i][j]);
-            }
-        }
         
         startMarker = new ValueMarker(0);
         startMarker.setPaint(Color.BLUE);
         endMarker = new ValueMarker(accel[0].length - 1);
         endMarker.setPaint(Color.BLUE);
+        
+        {
+            accelChart = createChartForTimeSeries("Acceleration", "accel",
+                                                  accelSeries, accel,
+                                                  startMarker, endMarker);
+            ChartPanel cPanel = (ChartPanel)panAccel;
+            cPanel.setChart(accelChart);
+        }
+        {
+            gyroChart = createChartForTimeSeries("Gyroscope", "gyro",
+                                                 gyroSeries, gyro,
+                                                 startMarker, endMarker);
+            ChartPanel cPanel = (ChartPanel)panGyro;
+            cPanel.setChart(gyroChart);
+        }
         
         startSpinnerModel = (SpinnerNumberModel) startSpinner.getModel();
         endSpinnerModel = (SpinnerNumberModel) endSpinner.getModel();
@@ -115,12 +122,35 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         endSpinnerModel.setValue(Math.max(length, accel[0].length - 1));
         spinnerSetCommitOnEdit(startSpinner);
         spinnerSetCommitOnEdit(endSpinner);
+    }
+    
+    // Create plot for a 3 axis time series (accel or gyro)
+    private static JFreeChart createChartForTimeSeries(
+                                  String title,
+                                  String name,
+                                  XYSeries[] series,
+                                  float[][] data,
+                                  ValueMarker startMarker,
+                                  ValueMarker endMarker) {
+        XYSeriesCollection col = new XYSeriesCollection();
+        series[0] = new XYSeries("X", true, false);
+        col.addSeries(series[0]);
+        series[1] = new XYSeries("Y", true, false);
+        col.addSeries(series[1]);
+        series[2] = new XYSeries("Z", true, false);
+        col.addSeries(series[2]);
         
-        chart = ChartFactory.createXYLineChart(
-                "Acceleration",
+        for (int i = 0; i < data.length; ++i) {
+            for (int j = 0; j < data[i].length; ++j) {
+                series[i].add(j, data[i][j]);
+            }
+        }
+        
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                title,
                 "Samples",
-                "Accel",
-                accelCol,
+                name,
+                col,
                 PlotOrientation.VERTICAL,
                 true,
                 false,
@@ -140,20 +170,19 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         axisAcc.setTickLabelsVisible(true);  // Hide the axis labels
         
         plot.setRenderer(new XYLineAndShapeRenderer(true, false) {
-          @Override
-          public Paint lookupSeriesPaint(int series) {
-              checkState(series >= 0 && series < 3);
-              switch(series) {
-                      case 0: return Color.RED;
-                      case 1: return Color.GREEN;
-                      case 2: return Color.BLUE;
-                      default: return Color.BLACK;
-              }
-          }
-      });
+            @Override
+            public Paint lookupSeriesPaint(int series) {
+                checkState(series >= 0 && series < 3);
+                switch (series) {
+                    case 0: return Color.RED;
+                    case 1: return Color.GREEN;
+                    case 2: return Color.BLUE;
+                    default: return Color.BLACK;
+                }
+            }
+        });
         
-        ChartPanel cPanel = (ChartPanel)panAccel;
-        cPanel.setChart(chart);
+        return chart;
     }
     
     private static void spinnerSetCommitOnEdit(JSpinner spinner) {
@@ -173,6 +202,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         panAccel = new ChartPanel(null);
+        panGyro = new ChartPanel(null);
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         startSpinner = new javax.swing.JSpinner();
@@ -183,17 +213,33 @@ public class CaptureEditFrame extends javax.swing.JFrame {
         saveButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
 
         javax.swing.GroupLayout panAccelLayout = new javax.swing.GroupLayout(panAccel);
         panAccel.setLayout(panAccelLayout);
         panAccelLayout.setHorizontalGroup(
             panAccelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 453, Short.MAX_VALUE)
         );
         panAccelLayout.setVerticalGroup(
             panAccelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 188, Short.MAX_VALUE)
+            .addGap(0, 124, Short.MAX_VALUE)
         );
+
+        getContentPane().add(panAccel);
+
+        javax.swing.GroupLayout panGyroLayout = new javax.swing.GroupLayout(panGyro);
+        panGyro.setLayout(panGyroLayout);
+        panGyroLayout.setHorizontalGroup(
+            panGyroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 453, Short.MAX_VALUE)
+        );
+        panGyroLayout.setVerticalGroup(
+            panGyroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 124, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(panGyro);
 
         jLabel1.setText("Start");
 
@@ -247,7 +293,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
                                 .addComponent(commandSpinner)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(endSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(131, Short.MAX_VALUE))
+                .addContainerGap(193, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -267,26 +313,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panAccel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panAccel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+        getContentPane().add(jPanel1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -356,10 +383,9 @@ public class CaptureEditFrame extends javax.swing.JFrame {
             writeAxis(saveWriter, "Accel Y", Arrays.copyOfRange(accelData[1], start, end));
             writeAxis(saveWriter, "Accel Z", Arrays.copyOfRange(accelData[2], start, end));
             
-            // TODO: Gyro is just fill-in data
-            writeAxis(saveWriter, "Gyro X", Arrays.copyOfRange(accelData[0], start, end));
-            writeAxis(saveWriter, "Gyro Y", Arrays.copyOfRange(accelData[1], start, end));
-            writeAxis(saveWriter, "Gyro Z", Arrays.copyOfRange(accelData[2], start, end));
+            writeAxis(saveWriter, "Gyro X", Arrays.copyOfRange(gyroData[0], start, end));
+            writeAxis(saveWriter, "Gyro Y", Arrays.copyOfRange(gyroData[1], start, end));
+            writeAxis(saveWriter, "Gyro Z", Arrays.copyOfRange(gyroData[2], start, end));
             saveWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(CaptureEditFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -427,10 +453,43 @@ public class CaptureEditFrame extends javax.swing.JFrame {
              1948}
         };
         
+        final float[][] gyro1 = {
+            {200, 200, 200, 3665, 3652, 3565, 3449, 3319, 3271, 3175, 3105,
+             2996, 2956, 2911, 2785, 2717, 2574, 2426, 2374, 2264, 2177, 2040,
+             1930, 1797, 1567, 1309, 1068,  876,  776,  692,  676,  640,  473,
+              315,  149,   46,   22,   22,   22,   26,   95,  161,  273,  342,
+              456,  599,  808,  986, 1129, 1288, 1400, 1519, 1724, 1822, 1922,
+             2008, 2066, 2125, 2144, 2172, 2322, 2906, 3722, 4074, 3872, 3743,
+             3773, 3943, 4077, 4076, 4071, 3812, 3641, 3668, 3587, 3477, 3406,
+             3344, 3258, 3175, 3108, 3004, 2970, 2924, 2867, 2852, 2838, 2779,
+             2817, 2832, 2833, 2852, 2881, 2879, 2851, 2877, 2857, 2847, 2794,
+             2758},
+            {1681, 1665, 1674, 1656, 1693, 1666, 1643, 1621, 1614, 1639, 1652,
+             1738, 1759, 1778, 1793, 1804, 1850, 1882, 1890, 1917, 1967, 1945,
+             1934, 1916, 1898, 1894, 1791, 1727, 1694, 1780, 1806, 1773, 1814,
+             1828, 1856, 1852, 1837, 1826, 1780, 1750, 1729, 1729, 1658, 1684,
+             1691, 1745, 1788, 1800, 1852, 1816, 1807, 1748, 1787, 1777, 1776,
+             1851, 1846, 1807, 1681, 1578, 1496, 1508, 1692, 1867, 1700, 1446,
+             1501, 1808, 2107, 2151, 2026, 1949, 1835, 1856, 1957, 1955, 1975,
+             1990, 1971, 1987, 1968, 1945, 1923, 1900, 1888, 1899, 1947, 1954,
+             1950, 1955, 1939, 1919, 1930, 1932, 1922, 1931, 1963, 1964, 1949,
+             1948},
+            {1681, 1665, 1674, 1656, 1693, 1666, 1643, 1621, 1614, 1639, 1652,
+             1738, 1759, 1778, 1793, 1804, 1850, 1882, 1890, 1917, 1967, 1945,
+             1934, 1916, 1898, 1894, 1791, 1727, 1694, 1780, 1806, 1773, 1814,
+             1828, 1856, 1852, 1837, 1826, 1780, 1750, 1729, 1729, 1658, 1684,
+             1691, 1745, 1788, 1800, 1852, 1816, 1807, 1748, 1787, 1777, 1776,
+             1851, 1846, 1807, 1681, 1578, 1496, 1508, 1692, 1867, 1700, 1446,
+             1501, 1808, 2107, 2151, 2026, 1949, 1835, 1856, 1957, 1955, 1975,
+             1990, 1971, 1987, 1968, 1945, 1923, 1900, 1888, 1899, 1947, 1954,
+             1950, 1955, 1939, 1919, 1930, 1932, 1922, 1931, 1963, 1964, 1949,
+             1948}
+        };
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CaptureEditFrame("movements", "", accel1, 75).setVisible(true);
+                new CaptureEditFrame("movements", "", accel1, gyro1, 75).setVisible(true);
             }
         });
     }
@@ -442,6 +501,7 @@ public class CaptureEditFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel panAccel;
+    private javax.swing.JPanel panGyro;
     private javax.swing.JButton saveButton;
     private javax.swing.JSpinner startSpinner;
     // End of variables declaration//GEN-END:variables
