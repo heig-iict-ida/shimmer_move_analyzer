@@ -17,6 +17,7 @@ import javax.swing.SpinnerNumberModel;
 import madsdf.shimmer.event.Globals;
 import madsdf.shimmer.glview.ShimmerAngleConverter;
 import madsdf.shimmer.glview.ShimmerCanvas;
+import madsdf.shimmer.gui.ChartsDrawer.Data;
 
 /**
  *
@@ -282,8 +283,8 @@ public class ShimmerDataPanel extends javax.swing.JPanel {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 FileWriter output = null;
-                float[][] accelData = chartsDrawer.getRecentAccelData();
-                new CaptureEditFrame("movements", btid, accelData, length).setVisible(true);
+                final Data data = chartsDrawer.getRecentData();
+                new CaptureEditFrame("movements", btid, data.accel, data.gyro, length).setVisible(true);
             }
         });
     }//GEN-LAST:event_btnSaveActionPerformed
